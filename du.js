@@ -20,12 +20,59 @@ Ext.application({
 });
 
 function createUI() {
-  Ext.create('Ext.Panel', {
-    renderTo     : Ext.getBody(),
-    width        : 200,
-    height       : 150,
-    bodyPadding  : 5,
-    title        : "Digital Universe",
-    html         : "test",
+  /*var uninav = Ext.create('DU.UniNav', {
+        region: 'north',
+        title: "UniNav",
+        id: "uninav-pane",
+        layout: 'fit',
+        height: 200,
+        width: '100%',
+        margin: '0 0 0 0'
+  });*/
+  Ext.create('Ext.container.Container', {
+    renderTo: Ext.getBody(),
+    title: "Digital Universe",
+    width: '100%',
+    height: '100%',
+    layout: 'border',
+    items: [{
+        region: 'west',
+        title: "Activities",
+        id: "activities-pane",
+        xtype: 'panel',
+        width: 200,
+        height: '100%',
+        collapsible: true,
+        split: true,
+        layout: 'fit'
+    },{
+        region: 'north',
+        //xtype: 'DU.UniNav',
+        xtype: 'panel',
+        title: "UniNav",
+        id: "uninav-pane",
+        height: 200,
+        width: '100%',
+        split: true,
+        layout: 'fit'
+    },{
+        region: 'center',
+        xtype: 'panel',
+        title: "Content",
+        id: "content-pane",
+        layout: 'fit'
+    }],
   });
+
+  /*Ext.create('DU.UniNav', {
+    renderTo     : Ext.getBody(),
+  });*/
 }
+Ext.ns('DU');
+Ext.define('DU.UniNav', {
+     extend: 'Ext.ux.IFrame',
+     //alias: '',
+     height: 200,
+     title: "Topics",
+     src: "../uninav/uninav.html",
+ });
