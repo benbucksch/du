@@ -44,7 +44,7 @@ function createUI() {
         layout: 'fit'
     },{
         region: 'north',
-        xtype: 'panel',
+        xtype: 'container',
         title: "UniNav",
         id: "uninav-pane",
         height: 200,
@@ -54,7 +54,7 @@ function createUI() {
         layout: 'fit'
     },{
         region: 'center',
-        xtype: 'panel',
+        xtype: 'container',
         title: "Content",
         id: "content-pane",
         layout: 'fit'
