@@ -9,7 +9,7 @@
  * Alternative: events sent via postMessage(), see below.
  */
 function openTopic(topic) {
-  document.getElementById("title").textContent = topic.title;
+  Ext.getCmp("content-pane").setTitle(topic.title);
 }
 
 Ext.application({
@@ -76,8 +76,8 @@ function createUI() {
         layout: 'fit'
     },{
         region: 'center',
-        xtype: 'container',
-        title: "Content",
+        xtype: 'panel',
+        title: "",
         id: "content-pane",
         layout: 'fit'
     }],
