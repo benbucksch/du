@@ -26,6 +26,18 @@ function createUI() {
         src: "../uninav/uninav.html",
     }
   });
+  /*var activities = Ext.create('Ext.tab.Panel', {
+        width: '100%',
+        height: '100%',
+        activeTab: 0,
+        items: [{
+          title: "Learn",
+          html: "foo"
+        },{
+          title: "Explore",
+          html: "foo"
+        }],
+  });*/
   Ext.create('Ext.container.Container', {
     renderTo: Ext.getBody(),
     title: "Digital Universe",
@@ -37,6 +49,7 @@ function createUI() {
         title: "Activities",
         id: "activities-pane",
         xtype: 'panel',
+        //items: [ activities ], // TODO breaks layout
         width: 200,
         height: '100%',
         collapsible: true,
