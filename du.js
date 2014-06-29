@@ -20,15 +20,12 @@ Ext.application({
 });
 
 function createUI() {
-  /*var uninav = Ext.create('DU.UniNav', {
-        region: 'north',
-        title: "UniNav",
-        id: "uninav-pane",
-        layout: 'fit',
-        height: 200,
-        width: '100%',
-        margin: '0 0 0 0'
-  });*/
+  var uninav = Ext.create('Ext.Component', {
+    autoEl: {
+        tag: 'iframe',
+        src: "../uninav/uninav.html",
+    }
+  });
   Ext.create('Ext.container.Container', {
     renderTo: Ext.getBody(),
     title: "Digital Universe",
@@ -47,13 +44,13 @@ function createUI() {
         layout: 'fit'
     },{
         region: 'north',
-        //xtype: 'DU.UniNav',
         xtype: 'panel',
         title: "UniNav",
         id: "uninav-pane",
         height: 200,
         width: '100%',
         split: true,
+        items : [uninav],
         layout: 'fit'
     },{
         region: 'center',
@@ -63,16 +60,4 @@ function createUI() {
         layout: 'fit'
     }],
   });
-
-  /*Ext.create('DU.UniNav', {
-    renderTo     : Ext.getBody(),
-  });*/
 }
-Ext.ns('DU');
-Ext.define('DU.UniNav', {
-     extend: 'Ext.ux.IFrame',
-     //alias: '',
-     height: 200,
-     title: "Topics",
-     src: "../uninav/uninav.html",
- });
