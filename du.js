@@ -26,18 +26,6 @@ function createUI() {
         src: "../uninav/uninav.html",
     }
   });
-  /*var activities = Ext.create('Ext.tab.Panel', {
-        width: '100%',
-        height: '100%',
-        activeTab: 0,
-        items: [{
-          title: "Learn",
-          html: "foo"
-        },{
-          title: "Explore",
-          html: "foo"
-        }],
-  });*/
   Ext.create('Ext.container.Container', {
     renderTo: Ext.getBody(),
     title: "Digital Universe",
@@ -49,12 +37,21 @@ function createUI() {
         title: "Activities",
         id: "activities-pane",
         xtype: 'panel',
-        //items: [ activities ], // TODO breaks layout
+        layout: 'accordion',
+        items: [{
+          title: "Learn",
+          id: "activity-learn",
+        },{
+          title: "Explore",
+          id: "activity-explore",
+        },{
+          title: "Discuss",
+          id: "activity-discuss",
+        }],
         width: 200,
         height: '100%',
         collapsible: true,
         split: true,
-        layout: 'fit'
     },{
         region: 'north',
         xtype: 'container',
