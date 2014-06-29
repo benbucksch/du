@@ -1,0 +1,5 @@
+*~
+*.diff
+*.sh
+lib/
+img/
