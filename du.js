@@ -53,6 +53,18 @@ function createUI() {
         collapsible: true,
         split: true,
     },{
+        region: 'east',
+        title: "Examine",
+        id: "details-pane",
+        xtype: 'panel',
+        layout: 'accordion',
+        items: [],
+        width: 200,
+        height: '100%',
+        hidden: true,
+        collapsible: true,
+        split: true,
+    },{
         region: 'north',
         xtype: 'container',
         title: "UniNav",
