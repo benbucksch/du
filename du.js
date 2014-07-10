@@ -10,6 +10,37 @@
  */
 function openTopic(topic) {
   Ext.getCmp("content-pane").setTitle(topic.title);
+
+  var subjectID = topic.subjects && topic.subjects[0] || "dbpedia:" + topic.title;
+
+  sparqlSelect(esc(subjectID) + " dbpedia-owl:abstract ?abstract", function(result) {
+    var abstract = result.abstract.value;
+    assert(abstract, "No abstract found for: " + topic.title);
+    Ext.getCmp("content-pane").update(abstract); // sets content
+  }, errorCritical);
+}
+
+function esc(str) {
+  // TODO
+  return str.replace(/\"/g, "'");
+}
+
+function sparqlSelect(query, resultCallback, errorCallback) {
+  var query = "SELECT ?abstract WHERE {" +
+    query + " . " +
+    "filter(langMatches(lang(?abstract), 'en'))" +
+  "} limit 1";
+  loadURL({
+    url : "http://sparql.manyone.zone/sparql",
+    urlArgs : {
+      query : query,
+      format : "application/sparql-results+json",
+    },
+    dataType : "json",
+  }, function(json) {
+    ddebug(JSON.stringify(json, " ", 2));
+    resultCallback(json.result.bindings);
+  }, errorCallback);
 }
 
 Ext.application({
@@ -82,4 +113,12 @@ function createUI() {
         layout: 'fit'
     }],
   });
+}
+
+function errorCritical(e) {
+  alert(e);
+}
+
+function ddebug(msg) {
+  alert(msg);
 }
