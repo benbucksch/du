@@ -15,6 +15,7 @@ function openTopic(topic) {
   var title = topic.title
       .replace(/ \&.*/g, "") // HACK: With "A&B", take only A
       .replace(/, .*/g, ""); // HACK: With "A, B & C", take only A
+  title = title[0] + title.substr(1).toLowerCase(); // Double words in lowercase
   var subjectID = topic.subjects && topic.subjects[0] || "dbpedia:" + title;
 
   sparqlSelect(esc(subjectID) + " dbpedia-owl:abstract ?abstract", function(result) {
