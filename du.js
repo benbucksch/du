@@ -35,11 +35,12 @@ function sparqlSelect(query, resultCallback, errorCallback) {
     urlArgs : {
       query : query,
       format : "application/sparql-results+json",
+      callback : "load",
     },
     dataType : "json",
   }, function(json) {
     ddebug(JSON.stringify(json, " ", 2));
-    resultCallback(json.result.bindings);
+    resultCallback(json.results.bindings[0]);
   }, errorCallback);
 }
 
