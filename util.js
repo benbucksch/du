@@ -48,15 +48,6 @@ function loadURL(params, successCallback, errorCallback) {
   var dataType = params.dataType;
   assert(typeof(dataType) == "string" && dataType, "need type");
 
-  if (params.lib == "jquery") {
-    $.getJSON(url, {
-      dataType : dataType,
-      success : successCallback,
-      error : errorCallback,
-    });
-    return;
-  }
-
   var mimetype = null;
   //if (url.substr(0, 7) == "file://") {
     if (dataType == "text") {
@@ -65,7 +56,7 @@ function loadURL(params, successCallback, errorCallback) {
       mimetype = "text/xml";
     } else if (dataType == "html") {
       mimetype = "text/html";
-    } else if (dataType == "json" || dataType == "jsonp") {
+    } else if (dataType == "json") {
       //mimetype = "text/plain";
       mimetype = "text/javascript";
     } else {
@@ -73,6 +64,15 @@ function loadURL(params, successCallback, errorCallback) {
     }
     mimetype += "; charset=UTF-8";
   //}
+
+  /*if (params.lib == "jquery") {
+    $.getJSON(url, {
+      dataType : dataType,
+      success : successCallback,
+      error : errorCallback,
+    });
+    return;
+  }*/
 
   // <copied from="FetchHTTP">
   console.log("trying to open " + url);
@@ -139,7 +139,7 @@ function loadURL(params, successCallback, errorCallback) {
       data = req.responseXML;
     } else if (dataType == "html") {
       data = new DOMParser().parseFromString(data, "text/html");
-    } else if (dataType == "json" || dataType == "jsonp") {
+    } else if (dataType == "json") {
       if (data.substr(0, 5) == "load(") {
         data = data.substr(5, data.length - 6);
       }
