@@ -10,8 +10,12 @@
  */
 function openTopic(topic) {
   Ext.getCmp("content-pane").setTitle(topic.title);
+  Ext.getCmp("content-pane").update(""); // clear old content
 
-  var subjectID = topic.subjects && topic.subjects[0] || "dbpedia:" + topic.title;
+  var title = topic.title
+      .replace(/ \&.*/g, "") // HACK: With "A&B", take only A
+      .replace(/, .*/g, ""); // HACK: With "A, B & C", take only A
+  var subjectID = topic.subjects && topic.subjects[0] || "dbpedia:" + title;
 
   sparqlSelect(esc(subjectID) + " dbpedia-owl:abstract ?abstract", function(result) {
     var abstract = result.abstract.value;
@@ -22,7 +26,10 @@ function openTopic(topic) {
 
 function esc(str) {
   // TODO
-  return str.replace(/\"/g, "'");
+  return str
+    .replace(/\&/g, "and")
+    .replace(/\"/g, "'")
+    .replace(/ /g, "_");
 }
 
 function sparqlSelect(query, resultCallback, errorCallback) {
@@ -39,7 +46,6 @@ function sparqlSelect(query, resultCallback, errorCallback) {
     },
     dataType : "json",
   }, function(json) {
-    ddebug(JSON.stringify(json, " ", 2));
     resultCallback(json.results.bindings[0]);
   }, errorCallback);
 }
