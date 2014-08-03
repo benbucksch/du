@@ -160,11 +160,11 @@ function createUI() {
   Ext.getCmp("activity-watch").getEl().on("click", function() {
     loadActivityWatch(gTopic);
   });
-  Ext.getCmp("activity-watch").getEl().on("click", function() {
-    loadActivityWatch(gTopic);
-  });
   Ext.getCmp("activity-understand").getEl().on("click", function() {
     loadActivityUnderstand(gTopic);
+  });
+  Ext.getCmp("activity-create").getEl().on("click", function() {
+    loadActivityCreate(gTopic);
   });
 }
 
@@ -175,7 +175,7 @@ function loadActivityLearn(topic) {
   title = title[0] + title.substr(1).toLowerCase(); // Double words in lowercase
   var subjectID = topic.subjects && topic.subjects[0] || "dbpedia:" + title;
 
-  Ext.getCmp("content-pane").update(""); // clear old content
+  Ext.getCmp("content-pane").removeAll(); // clear old content
   sparqlSelect(esc(subjectID) + " dbpedia-owl:abstract ?abstract", function(result) {
     var abstract = result.abstract.value;
     assert(abstract, "No abstract found for: " + topic.title);
@@ -190,28 +190,33 @@ function loadActivityUnderstand(topic) {
       .replace(/ /g, "_");
   title = title[0] + title.substr(1).toLowerCase(); // Double words in lowercase
 
-  loadContentPage("http://en.m.wikipedia.org/wiki/" + encodeURIComponent(title));
+  loadContentPage(
+      "http://en.m.wikipedia.org/wiki/" + encodeURIComponent(title),
+      "Understand " + topic.title);
 }
 
 function loadActivityWatch(topic) {
-  loadContentPage("https://www.youtube.com/results?search_query=" +
-      encodeURIComponent(topic.title));
+  loadContentPage(
+      "https://www.youtube.com/results?search_query=" +
+      encodeURIComponent(topic.title),
+      "Watch " + topic.title + " movies");
 }
 
 function loadActivityCreate(topic) {
   var domain = topic.title.replace(/[ \&\,]*/g, "").toLowerCase() + "expert.org";
   var linktext = "Register " + domain + " now";
   var url = "http://www.securepaynet.net/domains/search.aspx?prog_id=473220&domainToCheck=" + domain + "&tld=.org&checkAvail=1";
-  alert("open " + url);
-  loadContentPage(url);
+  loadContentPage(url, "Create the " + topic.title + " portal");
 }
 
 function loadActivityNews(topic) {
-  var url = "http://" + gSite + "/activity-news.php";
-  loadContentPage(url);
+  loadContentPage(
+      "http://" + gSite + "/activity-news.php",
+      topic.title + " News");
 }
 
-function loadContentPage(url) {
+function loadContentPage(url, title) {
+  ddebug("open URL " + url);
   var iframe = Ext.create('Ext.Component', {
     autoEl: {
         tag: 'iframe',
@@ -219,6 +224,7 @@ function loadContentPage(url) {
     }
   });
   var pane = Ext.getCmp("content-pane");
+  pane.setTitle(title);
   pane.removeAll(); // clear
   pane.add(iframe);
 }
