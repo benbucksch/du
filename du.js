@@ -12,17 +12,7 @@ function openTopic(topic) {
   Ext.getCmp("content-pane").setTitle(topic.title);
   Ext.getCmp("content-pane").update(""); // clear old content
 
-  var title = topic.title
-      .replace(/ \&.*/g, "") // HACK: With "A&B", take only A
-      .replace(/, .*/g, ""); // HACK: With "A, B & C", take only A
-  title = title[0] + title.substr(1).toLowerCase(); // Double words in lowercase
-  var subjectID = topic.subjects && topic.subjects[0] || "dbpedia:" + title;
-
-  sparqlSelect(esc(subjectID) + " dbpedia-owl:abstract ?abstract", function(result) {
-    var abstract = result.abstract.value;
-    assert(abstract, "No abstract found for: " + topic.title);
-    Ext.getCmp("content-pane").update(abstract); // sets content
-  }, errorCritical);
+  loadActivityLearn(topic);
 }
 
 function esc(str) {
@@ -121,6 +111,43 @@ function createUI() {
         layout: 'fit'
     }],
   });
+}
+
+function loadActivityLearn(topic) {
+  var title = topic.title
+      .replace(/ \&.*/g, "") // HACK: With "A&B", take only A
+      .replace(/, .*/g, ""); // HACK: With "A, B & C", take only A
+  title = title[0] + title.substr(1).toLowerCase(); // Double words in lowercase
+  var subjectID = topic.subjects && topic.subjects[0] || "dbpedia:" + title;
+
+  sparqlSelect(esc(subjectID) + " dbpedia-owl:abstract ?abstract", function(result) {
+    var abstract = result.abstract.value;
+    assert(abstract, "No abstract found for: " + topic.title);
+    Ext.getCmp("content-pane").update(abstract); // sets content
+  }, errorCritical);
+}
+
+function loadActivityCreate(topic) {
+  var domain = topic.title.replace(/[ \&\,]*/g, "").toLowerCase() + "expert.org";
+  var linktext = "Register " + domain + " now";
+  var url = "http://www.securepaynet.net/domains/search.aspx?prog_id=473220&domainToCheck=" + domain + "&tld=.org&checkAvail=1";
+  loadContentPage(url);
+}
+
+function loadActivityNews(topic) {
+  var url = "http://www.libraryoffrance.org/activity-news.php";
+  loadContentPage(url);
+}
+
+function loadContentPage(url) {
+  var iframe = Ext.create('Ext.Component', {
+    autoEl: {
+        tag: 'iframe',
+        src: url,
+    }
+  });
+  Ext.getCmp("content-pane").update(""); // clear
+  Ext.getCmp("content-pane").add(iframe);
 }
 
 function errorCritical(e) {
