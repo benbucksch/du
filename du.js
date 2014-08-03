@@ -197,7 +197,8 @@ function loadActivityUnderstand(topic) {
 
 function loadActivityWatch(topic) {
   loadContentPage(
-      "https://www.youtube.com/results?search_query=" +
+      // "https://www.youtube.com/results?search_query=" + youtube forbids framing
+      "https://video.search.yahoo.com/search/?p=" +
       encodeURIComponent(topic.title),
       "Watch " + topic.title + " movies");
 }
