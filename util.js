@@ -30,6 +30,36 @@ function extend(child, supertype)
 }
 
 
+
+/**
+ * Parses a URL query string into an object.
+ *
+ * @param queryString {String} query ("?foo=bar&baz=3") part of the URL,
+ *     with or without the leading question mark
+ * @returns {Object} JS map { name1 : "value", name2: "othervalue" }
+ */
+function parseURLQueryString(queryString)
+{
+  var queryParams = {};
+  if (queryString.charAt(0) == "?")
+    queryString = queryString.substr(1); // remove leading "?", if it exists
+  var queries = queryString.split("&");
+  for (var i = 0; i < queries.length; i++) {
+    try {
+      if ( !queries[i]) {
+        continue;
+      }
+      var querySplit = queries[i].split("=");
+      var value = querySplit[1].replace(/\+/g, " "); // "+" is space, before decoding
+      queryParams[querySplit[0]] = decodeURIComponent(value);
+    } catch (e) {
+      // Errors parsing the query string are not fatal, we should just continue
+      errorNonCritical(e);
+    }
+  }
+  return queryParams;
+}
+
 /**
  * @param url {String}   http[s]:// or file:///
  * @dataType {String-enum}  Expected type of file contents
