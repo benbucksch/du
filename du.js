@@ -154,6 +154,9 @@ function createUI() {
         layout: 'fit'
     }],
   });
+  Ext.getCmp("activity-learn").getEl().on("click", function() {
+    loadActivityLearn(gTopic);
+  });
   Ext.getCmp("activity-inform").getEl().on("click", function() {
     loadActivityNews(gTopic);
   });
@@ -205,7 +208,6 @@ function loadActivityWatch(topic) {
 
 function loadActivityCreate(topic) {
   var domain = topic.title.replace(/[ \&\,]*/g, "").toLowerCase() + "expert.org";
-  var linktext = "Register " + domain + " now";
   var url = "http://www.securepaynet.net/domains/search.aspx?prog_id=473220&domainToCheck=" + domain + "&tld=.org&checkAvail=1";
   loadContentPage(url, "Create the " + topic.title + " portal");
 }
@@ -213,7 +215,7 @@ function loadActivityCreate(topic) {
 function loadActivityNews(topic) {
   loadContentPage(
       "http://" + gSite + "/activity-news.php",
-      topic.title + " News");
+      "News");
 }
 
 function loadContentPage(url, title) {
