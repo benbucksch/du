@@ -14,7 +14,7 @@ var gTopic;
 function openTopic(topic) {
   gTopic = topic;
   Ext.getCmp("content-pane").setTitle(topic.title);
-  loadActivityLearn(topic);
+  loadActivityDefault(topic);
 }
 
 /**
@@ -29,6 +29,18 @@ function startupTopic() {
   });
 }
 
+function dbpediaID(topic) {
+  if ( !topic.dbpediaID) {
+    var title = topic.title
+        .replace(/ \&.*/g, "") // HACK: With "A&B", take only A
+        .replace(/, .*/g, "") // HACK: With "A, B & C", take only A
+        .replace(/ /g, "_"); // Spaces -> _
+    title = title[0] + title.substr(1).toLowerCase(); // Double words in lowercase
+    topic.dbpediaID = title;
+  }
+  return "dbpedia:" + topic.dbpediaID;
+}
+
 function esc(str) {
   // TODO
   return str
@@ -38,10 +50,6 @@ function esc(str) {
 }
 
 function sparqlSelect(query, resultCallback, errorCallback) {
-  var query = "SELECT ?abstract WHERE {" +
-    query + " . " +
-    "filter(langMatches(lang(?abstract), 'en'))" +
-  "} limit 1";
   loadURL({
     url : "http://sparql.manyone.zone/sparql",
     urlArgs : {
@@ -89,6 +97,9 @@ function createUI() {
         },{
           title: "Understand",
           id: "activity-understand",
+        },{
+          title: "Locate",
+          id: "activity-geo",
         },{
           title: "Explore",
           id: "activity-explore",
@@ -169,17 +180,25 @@ function createUI() {
   Ext.getCmp("activity-create").getEl().on("click", function() {
     loadActivityCreate(gTopic);
   });
+  Ext.getCmp("activity-geo").getEl().on("click", function() {
+    loadActivityGeo(gTopic);
+  });
+}
+
+/**
+ * Decides which activity to load for a given topic
+ */
+function loadActivityDefault(topic) {
+  loadActivityNews(topic);
 }
 
 function loadActivityLearn(topic) {
-  var title = topic.title
-      .replace(/ \&.*/g, "") // HACK: With "A&B", take only A
-      .replace(/, .*/g, ""); // HACK: With "A, B & C", take only A
-  title = title[0] + title.substr(1).toLowerCase(); // Double words in lowercase
-  var subjectID = topic.subjects && topic.subjects[0] || "dbpedia:" + title;
-
   Ext.getCmp("content-pane").removeAll(); // clear old content
-  sparqlSelect(esc(subjectID) + " dbpedia-owl:abstract ?abstract", function(result) {
+  var query = "SELECT ?abstract WHERE {" +
+    esc(dbpediaID(topic)) + " dbpedia-owl:abstract ?abstract" + " . " +
+    "filter(langMatches(lang(?abstract), '" + getLang() + "'))" + // one lang
+  "} limit 1";
+  sparqlSelect(query, function(result) {
     var abstract = result.abstract.value;
     assert(abstract, "No abstract found for: " + topic.title);
     Ext.getCmp("content-pane").update(abstract); // sets content
@@ -187,14 +206,9 @@ function loadActivityLearn(topic) {
 }
 
 function loadActivityUnderstand(topic) {
-  var title = topic.title
-      .replace(/ \&.*/g, "") // HACK: With "A&B", take only A
-      .replace(/, .*/g, "") // HACK: With "A, B & C", take only A
-      .replace(/ /g, "_");
-  title = title[0] + title.substr(1).toLowerCase(); // Double words in lowercase
-
+  var page = dbpediaID(topic).replace("dbpedia:", "");
   loadContentPage(
-      "http://en.m.wikipedia.org/wiki/" + encodeURIComponent(title),
+      "http://en.m.wikipedia.org/wiki/" + encodeURIComponent(page),
       "Understand " + topic.title);
 }
 
@@ -216,6 +230,23 @@ function loadActivityNews(topic) {
   loadContentPage(
       "http://" + gSite + "/activity-news.php",
       "News");
+}
+
+function loadActivityGeo(topic) {
+  Ext.getCmp("content-pane").removeAll(); // clear old content
+  var query = "SELECT ?lat ?lon WHERE {" + // only one language
+    esc(dbpediaID(topic)) + " geo:lat ?lat ; " +
+    " geo:long ?lon . " +
+  "} limit 1";
+  sparqlSelect(query, function(result) {
+    var lat = result.lat.value;
+    var lon = result.lon.value;
+    ddebug("lat,lon " + lat + "," + lon);
+    assert(lat && lon, "No location found for: " + topic.title);
+
+    var url = "http://www.openstreetmap.org/#map=8/" + lat + "/" + lon; // HACK
+    loadContentPage(url, "Go to " + topic.title);
+  }, errorCritical);
 }
 
 function loadContentPage(url, title) {
