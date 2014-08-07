@@ -98,7 +98,7 @@ function createUI() {
           title: "Understand",
           id: "activity-understand",
         },{
-          title: "Locate",
+          title: "Go to",
           id: "activity-geo",
         },{
           title: "Explore",
@@ -244,7 +244,7 @@ function loadActivityGeo(topic) {
     ddebug("lat,lon " + lat + "," + lon);
     assert(lat && lon, "No location found for: " + topic.title);
 
-    var url = "http://www.openstreetmap.org/#map=8/" + lat + "/" + lon; // HACK
+    var url = "geo/?lat=" + lat + "&lon=" + lon;
     loadContentPage(url, "Go to " + topic.title);
   }, errorCritical);
 }
