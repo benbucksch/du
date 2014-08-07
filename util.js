@@ -60,6 +60,12 @@ function parseURLQueryString(queryString)
   return queryParams;
 }
 
+
+function getLang() {
+  return "en";
+}
+
+
 /**
  * @param url {String}   http[s]:// or file:///
  * @dataType {String-enum}  Expected type of file contents
@@ -220,7 +226,8 @@ function ServerException(serverMsg, code, uri)
   if (code >= 300 && code < 600) { // HTTP error code
     msg += " " + code;
   }
-  msg += " <" + uri + ">";  Exception.call(this, msg);
+  msg += "\n\n<" + uri + ">";
+  Exception.call(this, msg);
   this.rootErrorMsg = serverMsg;
   this.code = code;
   this.uri = uri;
