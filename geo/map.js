@@ -11,16 +11,49 @@ function onLoad() {
   var lat = params.lat || 51.330;
   var lon = params.lon || 10.453;
 
-  // Init WebGLEarth
-  var map = new WE.map("map", {
-    zoom: 8.0,
-    position: [ lat, lon ],
-    sky: true,
-    atmosphere: true,
+  // Init Cesium
+  /*var terrainProvider = new Cesium.CesiumTerrainProvider({
+    url: "//cesiumjs.org/stk-terrain/tilesets/world/tiles",
+    requestVertexNormals: true,
+  });*/
+  /*var terrainProvider = new Cesium.CesiumTerrainProvider({
+    url: "//cesiumjs.org/tilesets/terrain/smallterrain",
+  });*/
+
+  var satProvider = new Cesium.ArcGisMapServerImageryProvider({
+    url: "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer",
   });
-  WE.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
-    attribution: "&copy; <a href='http://osm.org/copyright' target='_blank'>OpenStreetMap</a> contributors",
-  }).addTo(map);
+  /*var satProvider = new Cesium.TileMapServiceImageryProvider({
+    url: "../lib/Cesium/Assets/Textures/NaturalEarthII",
+    fileExtension: "jpg",
+  });*/
+
+  var viewer = new Cesium.Viewer("map", {
+    infoBox: false,
+    timeline: false,
+    navigationHelpButton: false,
+    homeButton: false,
+    fullscreenButton: false,
+    sceneModePicker: false,
+    selectionIndicator: false,
+    animation: false,
+    baseLayerPicker: false,
+    imageryProvider: satProvider,
+    //terrainProvider: terrainProvider,
+    targetFrameRate: 25,
+    creditCdontainer: "credits",
+  });
+  var scene = viewer.scene;
+
+  /*var streetLayer = viewer.scene.imageryLayers.addImageryProvider(
+    new Cesium.ArcGisMapServerImageryProvider({
+      url: "http://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer",
+    }));*/
+  var placeLayer = viewer.scene.imageryLayers.addImageryProvider(
+    new Cesium.ArcGisMapServerImageryProvider({
+      url: "http://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer",
+    }));
+
   /*
   // NASA Blue Marble <http://mike.teczno.com/notes/blue-marble-tiles.html>
   // Need to mirror once we make serious traffic
@@ -30,13 +63,29 @@ function onLoad() {
   });
   // zoom level 9 is not enough, so use OSM for > 9
   var osmLayerZoom = WE.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{
-    attribution: "&copy; <a href='http://osm.org/copyright' target='_blank'>OpenStreetMap</a> contributors",
+    attribution: "© <a href='http://osm.org/copyright' target='_blank'>OpenStreetMap</a> contributors",
     minZoom : 10,
     maxZoom : 18,
   });
-  WE.LayerGroup([ satLayer, osmLayerZoom ]).addTo(map);
   */
 
+  var cartographic = Cesium.Cartographic.fromDegrees(lon, lat);
+  var cartesian = Cesium.Ellipsoid.WGS84.cartographicToCartesian(cartographic);
+  scene.camera.setPositionCartographic(cartesian);
+
+  /*var west = Cesium.Math.toRadians(lat - 1);
+  var south = Cesium.Math.toRadians(lon - 1);
+  var east = Cesium.Math.toRadians(lat + 2);
+  var north = Cesium.Math.toRadians(lon + 1);
+  var extent = new Cesium.Extent(west, south, east, north);
+  scene.camera.viewExtent(extent, Cesium.Ellipsoid.WGS84);*/
+
+  /*var zoom = 8;
+  var flight = Cesium.CameraFlightPath.createTween(scene, {
+    destination : Cesium.Cartographic.fromDegrees(lat, lon, zoom),
+    duration: 1000,
+  });
+  scene.animations.add(flight);*/
 /*
   render();
   var zoomTween = new TWEEN.Tween({ zoom: map.getZoom() })

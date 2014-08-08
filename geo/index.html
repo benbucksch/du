@@ -4,6 +4,7 @@
 <title>Digital Earth</title>
 <meta charset="utf-8"></meta>
 <style>
+  @import url("../lib/Cesium/Widgets/widgets.css");
   /**
   * This file is
   * Copyright 2014 Ben Bucksch
@@ -15,15 +16,27 @@
     padding: 0 0 0 0;
     margin: 0 0 0 0;
   }
+  .cesium-widget-credits {
+    opacity: 0.2;
+  }
+  .cesium-credit-image img {
+    display: none;
+  }
+  .cesium-credit-image:after {
+    content: "Cesium";
+    margin-right: 0.5em;
+    margin-left: 0.5em;
+  }
 </style>
 </head>
 <body>
-<script type="text/javascript" src="http://www.webglearth.com/v2/api.js"></script>
-<script type="text/javascript" src="../uninav/lib/tween.min.js"></script>
+<script type="text/javascript" src="../lib/Cesium/Cesium.js"></script>
+<script type="text/javascript" src="../../uninav/lib/tween.min.js"></script>
 <script type="text/javascript" src="../util.js"></script>
 <script type="text/javascript" src="map.js"></script>
 
 <div id="map"></div>
+<div id="credits"></div>
 
 </body>
 </html>
