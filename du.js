@@ -27,6 +27,7 @@ function startupTopic() {
   var title = params.siteWords || gSite;
   openTopic({ // Fake topic
     title : title,
+    dbpediaID : title.split(" ")[0],
   });
 }
 
