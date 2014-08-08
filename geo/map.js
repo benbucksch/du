@@ -69,33 +69,25 @@ function onLoad() {
   });
   */
 
-  var cartographic = Cesium.Cartographic.fromDegrees(lon, lat);
-  var cartesian = Cesium.Ellipsoid.WGS84.cartographicToCartesian(cartographic);
-  scene.camera.setPositionCartographic(cartesian);
+  scene.camera.setPositionCartographic(
+    Cesium.Cartographic.fromDegrees(lon, lat, 500000)); // height in m
 
-  /*var west = Cesium.Math.toRadians(lat - 1);
-  var south = Cesium.Math.toRadians(lon - 1);
-  var east = Cesium.Math.toRadians(lat + 2);
-  var north = Cesium.Math.toRadians(lon + 1);
-  var extent = new Cesium.Extent(west, south, east, north);
-  scene.camera.viewExtent(extent, Cesium.Ellipsoid.WGS84);*/
+  /*scene.camera.flyTo({
+    destination: Cesium.Cartographic.fromDegrees(lon, lat, 500000),
+    duration: 1, // in s
+  });*/
 
-  /*var zoom = 8;
-  var flight = Cesium.CameraFlightPath.createTween(scene, {
-    destination : Cesium.Cartographic.fromDegrees(lat, lon, zoom),
-    duration: 1000,
-  });
-  scene.animations.add(flight);*/
-/*
+  /*
   render();
   var zoomTween = new TWEEN.Tween({ zoom: map.getZoom() })
-              .to({ zoom: 10.0 }, 2000)
+              .to({ height: 500000 }, 10000)
               .onUpdate(function() {
-                map.setZoom(this.zoom);
+                scene.camera.setPositionCartographic(
+                  Cesium.Cartographic.fromDegrees(lon, lat, this.height));
               })
               .easing(TWEEN.Easing.Quadratic.InOut)
               .start();
-*/
+  */
 }
 window.addEventListener("load", onLoad, false);
 
