@@ -13,6 +13,7 @@ var gTopic;
  */
 function openTopic(topic) {
   gTopic = topic;
+  Ext.getCmp("content-pane").removeAll();
   Ext.getCmp("content-pane").setTitle(topic.title);
   loadActivityDefault(topic);
 }
@@ -59,7 +60,9 @@ function sparqlSelect(query, resultCallback, errorCallback) {
     },
     dataType : "json",
   }, function(json) {
-    resultCallback(json.results.bindings[0]);
+    try {
+      resultCallback(json.results.bindings[0]);
+    } catch (e) { errorCallback(e); }
   }, errorCallback);
 }
 
@@ -98,7 +101,7 @@ function createUI() {
           title: "Understand",
           id: "activity-understand",
         },{
-          title: "Go to",
+          title: "Locate",
           id: "activity-geo",
         },{
           title: "Explore",
@@ -189,7 +192,11 @@ function createUI() {
  * Decides which activity to load for a given topic
  */
 function loadActivityDefault(topic) {
-  loadActivityNews(topic);
+  getLocation(topic, function() { // have location
+    loadActivityGeo(topic);
+  }, function(e) { // no location found
+    loadActivityUnderstand(topic);
+  });
 }
 
 function loadActivityLearn(topic) {
@@ -234,6 +241,17 @@ function loadActivityNews(topic) {
 
 function loadActivityGeo(topic) {
   Ext.getCmp("content-pane").removeAll(); // clear old content
+  getLocation(topic, function(lat, lon) {
+    var url = "geo/?lat=" + lat + "&lon=" + lon;
+    loadContentPage(url, "Go to " + topic.title);
+  }, errorCritical);
+}
+
+function getLocation(topic, resultCallback, errorCallback) {
+  if (topic.geo) {
+    resultCallback(topic.geo.lat, topic.geo.lon);
+    return;
+  }
   var query = "SELECT ?lat ?lon WHERE {" + // only one language
     esc(dbpediaID(topic)) + " geo:lat ?lat ; " +
     " geo:long ?lon . " +
@@ -242,11 +260,12 @@ function loadActivityGeo(topic) {
     var lat = result.lat.value;
     var lon = result.lon.value;
     ddebug("lat,lon " + lat + "," + lon);
-    assert(lat && lon, "No location found for: " + topic.title);
-
-    var url = "geo/?lat=" + lat + "&lon=" + lon;
-    loadContentPage(url, "Go to " + topic.title);
-  }, errorCritical);
+    if (lat && lon) {
+      resultCallback(lat, lon);
+    } else {
+      errorCallback("No location found");
+    }
+  }, errorCallback);
 }
 
 function loadContentPage(url, title) {
