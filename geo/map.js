@@ -6,8 +6,11 @@
  * using leafletjs, and do not load WebGLEarth in this case.
  */
 
+var du = window.parent;
+var gScene;
+
 function onLoad() {
-  var params = parseURLQueryString(window.location.search);
+  var params = parseURLQueryString(window.location.hash);
   var lat = params.lat || 51.330;
   var lon = params.lon || 10.453;
 
@@ -44,6 +47,7 @@ function onLoad() {
     creditCdontainer: "credits",
   });
   var scene = viewer.scene;
+  gScene = scene;
 
   /*var streetLayer = viewer.scene.imageryLayers.addImageryProvider(
     new Cesium.ArcGisMapServerImageryProvider({
@@ -88,9 +92,37 @@ function onLoad() {
               .easing(TWEEN.Easing.Quadratic.InOut)
               .start();
   */
+  //showPOIs(lat, lon, 5);
 }
 window.addEventListener("load", onLoad, false);
 
+/**
+ * Show interesting points around the position.
+ *
+ * @param radius {Integer} in km
+ */
+function showPOIs(lat, lon, radius) {
+  var query = "SELECT ?poi ?name ?lat ?lon WHERE {" +
+    "?poi dbpprop:name ?name ." +
+    "?poi geo:lat ?lat ." +
+    "?poi geo:long ?lon ." +
+    "?poi geo:geometry ?geo ." +
+    "FILTER (bif:st_intersects (?geo, bif:st_point (" + lon + ", " + lat + "), " + radius + "))" +
+  "} LIMIT 100"
+  du.sparqlSelect(query, function(results) {
+    //alert(dumpObject(results, "results", 3));
+    var labels = new Cesium.LabelCollection();
+    gScene.primitives.add(labels);
+    results.forEach(function(r) {
+      ddebug("POI " + r.name);
+      labels.add({
+        position: Cesium.Cartesian3.fromDegrees(r.lon, r.lat),
+        text : r.name,
+        dbpediaID : r.poi,
+      });
+    });
+  }, errorNonCritical);
+}
 
 function render(time) {
   requestAnimationFrame(render);

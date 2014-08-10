@@ -11,7 +11,12 @@ function assert(test, errorMsg) {
 }
 
 function errorCritical(e) {
+  ddebug(e);
   alert(e);
+}
+
+function errorNonCritical(e) {
+  ddebug(e);
 }
 
 function ddebug(msg) {
@@ -41,8 +46,8 @@ function extend(child, supertype)
 function parseURLQueryString(queryString)
 {
   var queryParams = {};
-  if (queryString.charAt(0) == "?")
-    queryString = queryString.substr(1); // remove leading "?", if it exists
+  if (queryString.charAt(0) == "?" || queryString.charAt(0) == "#")
+    queryString = queryString.substr(1); // remove leading "?" or "#", if it exists
   var queries = queryString.split("&");
   for (var i = 0; i < queries.length; i++) {
     try {
@@ -63,6 +68,50 @@ function parseURLQueryString(queryString)
 
 function getLang() {
   return "en";
+}
+
+
+/**
+ * Return the contents of an object as multi-line string, for debugging.
+ * @param obj {Object} What you want to show
+ * @param name {String} What this object is. Used as prefix in output.
+ * @param maxDepth {Integer} How many levels of properties to access.
+ *    1 = just the properties directly on |obj|
+ * @param curDepth {Integer} internal, ignore
+ */
+function dumpObject(obj, name, maxDepth, curDepth)
+{
+  if (curDepth == undefined)
+    curDepth = 1;
+  if (maxDepth != undefined && curDepth > maxDepth)
+    return "";
+
+  var result = "";
+  var i = 0;
+  for (var prop in obj)
+  {
+    i++;
+    if (typeof(obj[prop]) == "xml")
+    {
+      result += name + "." + prop + "=[object]" + "\n";
+      result += dumpObject(obj[prop], name + "." + prop, maxDepth, curDepth+1);
+    }
+    else if (typeof(obj[prop]) == "object")
+    {
+      if (obj[prop] && typeof(obj[prop].length) != "undefined")
+        result += name + "." + prop + "=[probably array, length " + obj[prop].length + "]" + "\n";
+      else
+        result += name + "." + prop + "=[object]" + "\n";
+      result += dumpObject(obj[prop], name + "." + prop, maxDepth, curDepth+1);
+    }
+    else if (typeof(obj[prop]) == "function")
+      result += name + "." + prop + "=[function]" + "\n";
+    else
+      result += name + "." + prop + "=" + obj[prop] + "\n";
+  }
+  if ( ! i)
+    result += name + " is empty\n";
+  return result;
 }
 
 

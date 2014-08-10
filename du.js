@@ -1,5 +1,6 @@
 var gSite;
 var gTopic;
+var du = this;
 
 /**
  * Change to go to another DU topic.
@@ -62,9 +63,32 @@ function sparqlSelect(query, resultCallback, errorCallback) {
     dataType : "json",
   }, function(json) {
     try {
-      resultCallback(json.results.bindings[0]);
+      if (json.results.bindings.length == 0) {
+        errorCallback("Nothing found");
+        return;
+      }
+      // drop the .value, and make it a real Array
+      var results = [];
+      var bindings = json.results.bindings;
+      for (var i = 0, l = bindings.length; i < l; i++) {
+        var cur = bindings[i];
+        var result = {};
+        for (var name in cur) {
+          result[name] = cur[name].value;
+        }
+        results.push(result);
+      }
+      resultCallback(results);
     } catch (e) { errorCallback(e); }
   }, errorCallback);
+}
+
+function sparqlSelect1(query, resultCallback, errorCallback) {
+  var myResultCallback = function(results) {
+    resultCallback(results[0]);
+  };
+  query += " LIMIT 1";
+  sparqlSelect(query, myResultCallback, errorCallback);
 }
 
 Ext.application({
@@ -205,9 +229,9 @@ function loadActivityLearn(topic) {
   var query = "SELECT ?abstract WHERE {" +
     esc(dbpediaID(topic)) + " dbpedia-owl:abstract ?abstract" + " . " +
     "filter(langMatches(lang(?abstract), '" + getLang() + "'))" + // one lang
-  "} limit 1";
-  sparqlSelect(query, function(result) {
-    var abstract = result.abstract.value;
+  "}";
+  sparqlSelect1(query, function(result) {
+    var abstract = result.abstract;
     assert(abstract, "No abstract found for: " + topic.title);
     Ext.getCmp("content-pane").update(abstract); // sets content
   }, errorCritical);
@@ -243,7 +267,7 @@ function loadActivityNews(topic) {
 function loadActivityGeo(topic) {
   Ext.getCmp("content-pane").removeAll(); // clear old content
   getLocation(topic, function(lat, lon) {
-    var url = "geo/?lat=" + lat + "&lon=" + lon;
+    var url = "geo/#lat=" + lat + "&lon=" + lon;
     loadContentPage(url, "Go to " + topic.title);
   }, errorCritical);
 }
@@ -256,27 +280,45 @@ function getLocation(topic, resultCallback, errorCallback) {
   var query = "SELECT ?lat ?lon WHERE {" + // only one language
     esc(dbpediaID(topic)) + " geo:lat ?lat ; " +
     " geo:long ?lon . " +
-  "} limit 1";
-  sparqlSelect(query, function(result) {
-    var lat = result.lat.value;
-    var lon = result.lon.value;
-    ddebug("lat,lon " + lat + "," + lon);
-    if (lat && lon) {
-      resultCallback(lat, lon);
-    } else {
-      errorCallback("No location found");
-    }
+  "}";
+  sparqlSelect1(query, function(result) {
+    resultCallback(result.lat, result.lon);
   }, errorCallback);
 }
 
-function loadContentPage(url, title) {
+/**
+ * Saves frames, to smoothly transition to new content
+ * when a frame of the same content type has been opened before.
+ * E.g. when going to Alaska and then going to Canada,
+ * do not destroy the frame, but keep it, and fly from
+ * Alaska to Canada, instead of just jumping in an instance,
+ * or reloading the page.
+ *
+ * Computationally, this saves JS load and compile time,
+ * lib init time, but wastes RAM, by keeping unused frames.
+ *
+ * Map URL {String} -> frame {Ext.Component}
+ */
+gFrames = {};
+
+function loadContentPage(url, title, keepFrame) {
   ddebug("open URL " + url);
-  var iframe = Ext.create('Ext.Component', {
-    autoEl: {
-        tag: 'iframe',
-        src: url,
+  var baseURL = url.replace(/#.*/, ""); // cut #params
+  var iframe;
+  if (keepFrame && gFrames[baseURL]) {
+    iframe = gFrames[baseURL];
+    iframe.autoEl.src = url;
+  } else {
+    iframe = Ext.create('Ext.Component', {
+      autoEl: {
+          tag: 'iframe',
+          src: url,
+      }
+    });
+    if (keepFrame) {
+      gFrames[baseURL] = iframe;
     }
-  });
+  }
   var pane = Ext.getCmp("content-pane");
   pane.setTitle(title);
   pane.removeAll(); // clear
