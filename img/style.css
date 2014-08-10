@@ -1,0 +1,53 @@
+/* Icons for activities */
+
+#activities-pane-body .x-title-text {
+  font-size: 16px;
+}
+#activities-pane-body .x-panel-header {
+  background-position: left top;
+  background-repeat: no-repeat;
+  padding-left: 54px;
+  background-color: #E0E0E0;
+  border-width: 1px !important;
+  border-image-width: 0px;
+}
+#activities-pane-body .x-panel-body {
+  border-width: 0px;
+}
+#activities-pane-body .x-mask {
+  background-color: #E0E0E0;
+}
+
+#activity-inform .x-panel-header {
+  background-image: url("newspaper.png");
+}
+#activity-understand .x-panel-header {
+  background-image: url("books.png");
+}
+#activity-geo .x-panel-header {
+  background-image: url("earth.png");
+}
+#activity-explore .x-panel-header {
+  background-image: url("gears.png");
+}
+#activity-learn .x-panel-header {
+  background-image: url("einstein.png");
+}
+#activity-watch .x-panel-header {
+  background-image: url("beach.png");
+}
+#activity-listen .x-panel-header {
+  background-image: url("music.png");
+}
+#activity-play .x-panel-header {
+  background-image: url("runner.png");
+}
+#activity-create .x-panel-header {
+  background-image: url("manyone-human.png");
+}
+#activity-teach .x-panel-header {
+  background-image: url("school.png");
+}
+#activity-discuss .x-panel-header {
+  background-image: url("postbox.png");
+}
