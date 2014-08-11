@@ -25,6 +25,10 @@ function ddebug(msg) {
   }
 }
 
+function E(id) {
+  return document.getElementById(id);
+}
+
 
 /**
  * Create a subtype.
