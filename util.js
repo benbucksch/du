@@ -6,27 +6,14 @@
 function assert(test, errorMsg) {
   errorMsg = errorMsg || "assertion failed";
   if ( !test) {
-    alert(errorMsg);
+    throw new Exception(errorMsg);
   }
-}
-
-function errorCritical(e) {
-  ddebug(e);
-  alert(e);
-}
-
-function errorNonCritical(e) {
-  ddebug(e);
 }
 
 function ddebug(msg) {
   if (console) {
     console.debug(msg);
   }
-}
-
-function E(id) {
-  return document.getElementById(id);
 }
 
 
