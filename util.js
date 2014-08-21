@@ -62,6 +62,55 @@ function getLang() {
 }
 
 
+function esc(str) {
+  // TODO
+  return str
+    .replace(/\&/g, "and")
+    .replace(/\"/g, "'")
+    .replace(/ /g, "_");
+}
+
+function sparqlSelect(query, resultCallback, errorCallback) {
+  loadURL({
+    url : "http://sparql.manyone.zone/sparql",
+    urlArgs : {
+      query : query,
+      format : "application/sparql-results+json",
+      callback : "load",
+    },
+    dataType : "json",
+  }, function(json) {
+    try {
+      if (json.results.bindings.length == 0) {
+        errorCallback("Nothing found");
+        return;
+      }
+      // drop the .value, and make it a real Array
+      var results = [];
+      var bindings = json.results.bindings;
+      for (var i = 0, l = bindings.length; i < l; i++) {
+        var cur = bindings[i];
+        var result = {};
+        for (var name in cur) {
+          result[name] = cur[name].value;
+        }
+        results.push(result);
+      }
+      resultCallback(results);
+    } catch (e) { errorCallback(e); }
+  }, errorCallback);
+}
+
+function sparqlSelect1(query, resultCallback, errorCallback) {
+  var myResultCallback = function(results) {
+    resultCallback(results[0]);
+  };
+  query += " LIMIT 1";
+  sparqlSelect(query, myResultCallback, errorCallback);
+}
+
+
+
 /**
  * Return the contents of an object as multi-line string, for debugging.
  * @param obj {Object} What you want to show
