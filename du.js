@@ -183,7 +183,7 @@ function loadActivityLearn(topic) {
     esc(dbpediaID(topic)) + " dbpedia-owl:abstract ?abstract" + " . " +
     "filter(langMatches(lang(?abstract), '" + getLang() + "'))" + // one lang
   "}";
-  sparqlSelect1(query, function(result) {
+  sparqlSelect1(query, {}, function(result) {
     var abstract = result.abstract;
     assert(abstract, "No abstract found for: " + topic.title);
     Ext.getCmp("content-pane").update(abstract); // sets content
@@ -234,7 +234,7 @@ function getLocation(topic, resultCallback, errorCallback) {
     esc(dbpediaID(topic)) + " geo:lat ?lat ; " +
     " geo:long ?lon . " +
   "}";
-  sparqlSelect1(query, function(result) {
+  sparqlSelect1(query, {}, function(result) {
     resultCallback(result.lat, result.lon);
   }, errorCallback);
 }

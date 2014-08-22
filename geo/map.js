@@ -109,7 +109,7 @@ function showPOIs(lat, lon, radius) {
     "?poi geo:geometry ?geo ." +
     "FILTER (bif:st_intersects (?geo, bif:st_point (" + lon + ", " + lat + "), " + radius + "))" +
   "} LIMIT 100"
-  du.sparqlSelect(query, function(results) {
+  du.sparqlSelect(query, {}, function(results) {
     //alert(dumpObject(results, "results", 3));
     var labels = new Cesium.LabelCollection();
     gScene.primitives.add(labels);

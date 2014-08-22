@@ -70,9 +70,10 @@ function esc(str) {
     .replace(/ /g, "_");
 }
 
-function sparqlSelect(query, resultCallback, errorCallback) {
+function sparqlSelect(query, params, resultCallback, errorCallback) {
+  assert(params && typeof(params) == "object");
   loadURL({
-    url : "http://sparql.manyone.zone/sparql",
+    url : "http://" + (params.server || "sparql.manyone.zone") + "/sparql",
     urlArgs : {
       query : query,
       format : "application/sparql-results+json",
