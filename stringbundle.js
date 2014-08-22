@@ -61,7 +61,7 @@
  *        the filename of the string bundle, in your addon's locale/<lang>/ directory
  */
 function StringBundle(path) {
-  this._url = "locale/" + getLang() + "/" + path;
+  this._url = "/du/locale/" + getLang() + "/" + path;
 }
 
 StringBundle.prototype = {
