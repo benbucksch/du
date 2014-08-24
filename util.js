@@ -72,8 +72,16 @@ function esc(str) {
 
 function sparqlSelect(query, params, resultCallback, errorCallback) {
   assert(params && typeof(params) == "object", "Need params");
+  var url;
+  if (params.url) {
+    url = params.url;
+  } else if (params.endpoint) {
+    url = "/sparql/" + params.endpoint + "/";
+  } else {
+    url = "/sparql/dbpedia/";
+  }
   loadURL({
-    url : "http://" + (params.server || "sparql.manyone.zone") + "/sparql",
+    url : url,
     urlArgs : {
       query : query,
       format : "application/sparql-results+json",
