@@ -147,7 +147,9 @@ function sparqlSelect(query, params, resultCallback, errorCallback) {
       }
       resultCallback(results);
     } catch (e) { errorCallback(e); }
-  }, errorCallback);
+  }, function(e) {
+    errorCallback(new SPARQLException(e, query));
+  });
 }
 
 function sparqlSelect1(query, params, resultCallback, errorCallback) {
@@ -374,3 +376,20 @@ ServerException.prototype =
 {
 }
 extend(ServerException, Exception);
+
+/**
+ * @param serverEx {ServerException}
+ * @param query {String} the SPARQL query string, readable
+ */
+function SPARQLException(serverEx, query)
+{
+  var msg = serverEx.rootErrorMsg;
+  msg += "\n\n" + query;
+  ServerException.call(this, serverEx.rootErrorMsg, serverEx.code, serverEx.uri);
+  this.query = query;
+  this._message = msg;
+}
+SPARQLException.prototype =
+{
+}
+extend(SPARQLException, ServerException);
