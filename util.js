@@ -71,7 +71,7 @@ function esc(str) {
 }
 
 function sparqlSelect(query, params, resultCallback, errorCallback) {
-  assert(params && typeof(params) == "object");
+  assert(params && typeof(params) == "object", "Need params");
   loadURL({
     url : "http://" + (params.server || "sparql.manyone.zone") + "/sparql",
     urlArgs : {
@@ -102,12 +102,12 @@ function sparqlSelect(query, params, resultCallback, errorCallback) {
   }, errorCallback);
 }
 
-function sparqlSelect1(query, resultCallback, errorCallback) {
+function sparqlSelect1(query, params, resultCallback, errorCallback) {
   var myResultCallback = function(results) {
     resultCallback(results[0]);
   };
   query += " LIMIT 1";
-  sparqlSelect(query, myResultCallback, errorCallback);
+  sparqlSelect(query, params, myResultCallback, errorCallback);
 }
 
 
