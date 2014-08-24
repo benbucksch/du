@@ -154,7 +154,7 @@ function sparqlSelect(query, params, resultCallback, errorCallback) {
   }, function(json) {
     try {
       if (json.results.bindings.length == 0) {
-        errorCallback("Nothing found");
+        errorCallback(new SPARQLException(new ServerException("Nothing found", 0, url), query));
         return;
       }
       // drop the .value, and make it a real Array
@@ -386,10 +386,10 @@ Exception.prototype =
 function ServerException(serverMsg, code, uri)
 {
   var msg = serverMsg;
-  if (code >= 300 && code < 600) { // HTTP error code
+  /*if (code >= 300 && code < 600) { // HTTP error code
     msg += " " + code;
   }
-  msg += "\n\n<" + uri + ">";
+  msg += "\n\n<" + uri + ">";*/
   Exception.call(this, msg);
   this.rootErrorMsg = serverMsg;
   this.code = code;
@@ -407,7 +407,7 @@ extend(ServerException, Exception);
 function SPARQLException(serverEx, query)
 {
   var msg = serverEx.rootErrorMsg;
-  msg += "\n\n" + query;
+  //msg += "\n\n" + query;
   ServerException.call(this, serverEx.rootErrorMsg, serverEx.code, serverEx.uri);
   this.query = query;
   this._message = msg;
