@@ -147,7 +147,8 @@ function sparqlSelect(query, params, resultCallback, errorCallback) {
     urlArgs : {
       query : query,
       format : "application/sparql-results+json",
-      callback : "load",
+      output : "json",
+      //callback : "load",
     },
     dataType : "json",
   }, function(json) {
