@@ -110,6 +110,21 @@ function esc(str) {
     .replace(/ /g, "_");
 }
 
+var cRDFPrefixes = {
+  rdfs: "http://www.w3.org/2000/01/rdf-schema#",
+  rdf: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+  dc: "http://purl.org/dc/elements/1.1/",
+  foaf: "http://xmlns.com/foaf/0.1/",
+  dbpedia: "http://dbpedia.org/resource/",
+  dbpediaprop: "http://dbpedia.org/property/",
+  dbpediaowl: "http://dbpedia.org/ontology/",
+  geo: "http://www.w3.org/2003/01/geo/wgs84_pos#",
+  geonames: "http://www.geonames.org/ontology#",
+  freebase: "http://rdf.freebase.com/ns/",
+  owl: "http://www.w3.org/2002/07/owl#",
+  skos: "http://www.w3.org/2004/02/skos/core#",
+};
+
 function sparqlSelect(query, params, resultCallback, errorCallback) {
   assert(params && typeof(params) == "object", "Need params");
   var url;
@@ -119,6 +134,13 @@ function sparqlSelect(query, params, resultCallback, errorCallback) {
     url = "/sparql/" + params.endpoint + "/";
   } else {
     url = "/sparql/dbpedia/";
+  }
+  if (params.prefixes) {
+    for (var prefix in params.prefixes) {
+      if (query.indexOf(prefix + ":") != -1) {
+        query = "PREFIX " + prefix + ": <" + params.prefixes[prefix] + "> " + query;
+      }
+    }
   }
   loadURL({
     url : url,
