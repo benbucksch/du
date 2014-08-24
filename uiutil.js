@@ -1,12 +1,16 @@
 
 
 function errorCritical(e) {
+  e = convertException(e); // util.js
   ddebug(e);
+  ddebug("Stack:\n" + (e.stack ? e.stack : "none"));
   alert(e);
 }
 
 function errorNonCritical(e) {
+  e = convertException(e); // util.js
   ddebug(e);
+  ddebug("Stack:\n" + (e.stack ? e.stack : "none"));
 }
 
 

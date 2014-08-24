@@ -26,6 +26,46 @@ function extend(child, supertype)
 }
 
 
+/**
+ * Cleans up exceptions into a common format
+ * @param e {Error or Exception or nsIException or String}
+ * @param Exception
+ */
+function convertException(e) {
+  // If we didn't get an Exception object (but e.g. a string),
+  // create one and give it a stack
+  if (typeof e != "object") {
+    e = new Exception(e);
+  }
+  if ( !e.stack) {
+    e.stack = Error().stack;
+  }
+  e.stack = _cleanupStack(e.stack);
+  return e;
+}
+
+
+/**
+ * Remove any functions from the stack that are related to
+ * showing or sending the error.
+ */
+function _cleanupStack(s) {
+  assert(typeof(s) == "string");
+  return s.split(/\n/).filter(function(element) {
+    if (element.match(/^convertException/) ||
+        element.match(/^UserError/) ||
+        element.match(/^Exception/) ||
+        element.match(/^NotReached/) ||
+        element.match(/^assert/) ||
+        element.match(/^errorCritical/) ||
+        element.match(/^errorNonCritical/) ||
+        element.match(/^errorInBackend/))
+      return false;
+    return true;
+    }).join("\n");
+}
+
+
 
 /**
  * Parses a URL query string into an object.
