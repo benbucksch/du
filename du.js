@@ -235,7 +235,7 @@ function getLocation(topic, resultCallback, errorCallback) {
     " geo:long ?lon . " +
   "}";
   sparqlSelect1(query, {}, function(result) {
-    resultCallback(result.lat, result.lon);
+    resultCallback(parseFloat(result.lat), parseFloat(result.lon));
   }, errorCallback);
 }
 
