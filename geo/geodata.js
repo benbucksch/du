@@ -66,7 +66,7 @@ function searchAddress(address, resultCallback, errorCallback) {
             place.icon,
             place.place_id));
       });
-      resultCallback(results.splice(0, 1)); // return first result only
+      resultCallback(results.slice(0, 1)); // return first result only
       //resultCallback(results);
     } catch (e) { errorCallback(e); }
   }, function(e) { errorCallback(e); });
