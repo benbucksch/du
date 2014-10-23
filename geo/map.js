@@ -7,14 +7,18 @@ var du = window.parent;
 var gMap;
 
 function onLoad() {
-  E("search-field").addEventListener("submit", onSearch, false);
   E("search-button").addEventListener("click", onSearch, false);
+  E("search-field").addEventListener("keypress", function(event) {
+    if (event.keyCode == 13) {
+      onSearch();
+    }
+  }, false);
 
   var params = parseURLQueryString(window.location.hash);
   var lat = params.lat || 51.330;
   var long = params.lon || 10.453;
 
-  var map = gMap = new Map3D();
+  var map = gMap = new Map2D();
   map.setPos(lat, long);
 
   dbpediaPOIs(lat, long, 5, function(pois) {
