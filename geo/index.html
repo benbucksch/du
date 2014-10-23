@@ -28,13 +28,30 @@
     margin-right: 0.5em;
     margin-left: 0.5em;
   }
+  #search-bar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 100;
+  }
+  #search-bar > label {
+    color: black;
+    text-shadow: 1px 1px 0px white;
+  }
 </style>
 </head>
 <body>
 <script type="text/javascript" src="../lib/Cesium/Cesium.js"></script>
 <script type="text/javascript" src="../../uninav/lib/tween.min.js"></script>
 <script type="text/javascript" src="../util.js"></script>
+<script type="text/javascript" src="../uiutil.js"></script>
 <script type="text/javascript" src="map.js"></script>
+
+<div id="search-bar">
+  <label>Find address</label>
+  <input id="search-field" size="30" placeholder="1600 Pennsylvania Ave, Washington" >
+  <button id="search-button">Lookup</button>
+</div>
 
 <div id="map"></div>
 <div id="credits"></div>

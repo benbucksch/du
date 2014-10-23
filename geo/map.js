@@ -92,37 +92,114 @@ function onLoad() {
               .easing(TWEEN.Easing.Quadratic.InOut)
               .start();
   */
-  //showPOIs(lat, lon, 5);
+
+  dbpediaPOIs(lat, lon, 5, showPOIs, errorNonCritical);
+
+  E("search-field").addEventListener("submit", onSearch, false);
+  E("search-button").addEventListener("click", onSearch, false);
 }
 window.addEventListener("load", onLoad, false);
+
+/**
+ * Shows a marker on the map
+ * @param name {string} to be disabled to user
+ * @param lat {float}
+ * @param long {float}
+ * @param icon {URL as string}
+ */
+function POI(name, lat, long, icon, id) {
+  ddebug("POI " + name);
+  this.name = name;
+  this.lat = lat;
+  this.long = long;
+  this.icon = icon;
+  this.id = id; // optional
+}
+POI.prototype = {
+}
 
 /**
  * Show interesting points around the position.
  *
  * @param radius {Integer} in km
  */
-function showPOIs(lat, lon, radius) {
+function showPOIs(pois) {
+    var labels = new Cesium.LabelCollection();
+    gScene.primitives.add(labels);
+    pois.forEach(function(poi) {
+      labels.add({
+        position: Cesium.Cartesian3.fromDegrees(poi.long, poi.lat),
+        text : poi.name,
+        poi : poi,
+      });
+    });
+}
+
+function onSearch(event) {
+  var errorCallback = function(e) {
+    // TODO show inline underneath search field
+    errorCritical(e);
+  };
+  var resultCallback = function(places) {
+    showPOIs(places);
+  };
+  var address = E("search-field").value;
+  if ( !address) {
+    errorCallback(new Exception("Nothing entered"));
+    return;
+  }
+  searchAddress(address, resultCallback, errorCallback);
+}
+
+/**
+ * @param address {string} a free-form street address
+ * @param resultCallback {Function(Array of {POI})}
+ */
+function searchAddress(address, resultCallback, errorCallback) {
+  loadURL({
+    url : "http://www.manyone.zone/geo/address",
+    urlArgs : {
+      q : address,
+      format : "json",
+    },
+    dataType : "json",
+  }, function(json) {
+    try {
+      if (json.length == 0) {
+        errorCallback(new Exception("Nothing found"));
+        return;
+      }
+      var results = [];
+      json.forEach(function(place) {
+        results.push(new POI(
+            place.display_name,
+            place.lat, place.lon,
+            place.icon,
+            place.place_id));
+      });
+      resultCallback(results);
+    } catch (e) { errorCallback(e); }
+  }, function(e) { errorCallback(e); });
+}
+
+function dbpediaPOIs(lat, long, radius, resultCallback, errorCallback) {
   var query = "SELECT ?poi ?name ?lat ?lon WHERE {" +
     "?poi dbpprop:name ?name ." +
     "?poi geo:lat ?lat ." +
     "?poi geo:long ?lon ." +
     "?poi geo:geometry ?geo ." +
-    "FILTER (bif:st_intersects (?geo, bif:st_point (" + lon + ", " + lat + "), " + radius + "))" +
+    "FILTER (bif:st_intersects (?geo, bif:st_point (" + long + ", " + lat + "), " + radius + "))" +
   "} LIMIT 100"
-  du.sparqlSelect(query, {}, function(results) {
-    //alert(dumpObject(results, "results", 3));
-    var labels = new Cesium.LabelCollection();
-    gScene.primitives.add(labels);
+  du.sparqlSelect(query, {}, function(r) {
+    //alert(dumpObject(results, "r", 3));
+    var results = [];
     results.forEach(function(r) {
-      ddebug("POI " + r.name);
-      labels.add({
-        position: Cesium.Cartesian3.fromDegrees(r.lon, r.lat),
-        text : r.name,
-        dbpediaID : r.poi,
-      });
+      results.push(new POI(r.name, r.lat, r.lon, null, r.poi));
     });
-  }, errorNonCritical);
+    resultCallback(results);
+  }, errorCallback);
 }
+
 
 function render(time) {
   requestAnimationFrame(render);
