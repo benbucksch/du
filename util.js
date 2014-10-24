@@ -133,7 +133,7 @@ function sparqlSelect(query, params, resultCallback, errorCallback) {
   } else if (params.endpoint) {
     url = "/sparql/" + params.endpoint + "/";
   } else {
-    url = "/sparql/dbpedia/";
+    url = "/sparql/m1/";
   }
   if (params.prefixes) {
     for (var prefix in params.prefixes) {

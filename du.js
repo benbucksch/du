@@ -179,7 +179,7 @@ function loadActivityDefault(topic) {
 
 function loadActivityLearn(topic) {
   Ext.getCmp("content-pane").removeAll(); // clear old content
-  var query = "SELECT ?abstract WHERE {" +
+  var query = "SELECT ?abstract FROM <http://en.dbpedia.org> WHERE {" +
     esc(dbpediaID(topic)) + " dbpedia-owl:abstract ?abstract" + " . " +
     "filter(langMatches(lang(?abstract), '" + getLang() + "'))" + // one lang
   "}";
@@ -230,7 +230,7 @@ function getLocation(topic, resultCallback, errorCallback) {
     resultCallback(topic.geo.lat, topic.geo.lon);
     return;
   }
-  var query = "SELECT ?lat ?lon WHERE {" + // only one language
+  var query = "SELECT * FROM <http://en.dbpedia.org> WHERE {" +
     esc(dbpediaID(topic)) + " geo:lat ?lat ; " +
     " geo:long ?lon . " +
   "}";
