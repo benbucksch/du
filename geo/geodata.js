@@ -23,18 +23,34 @@ POI.prototype = {
 * @param radius {Integer} in km
 */
 function dbpediaPOIs(lat, long, radius, resultCallback, errorCallback) {
-  var query = "SELECT ?poi ?name ?lat ?lon WHERE {" +
-    "?poi dbpprop:name ?name ." +
-    "?poi geo:lat ?lat ." +
-    "?poi geo:long ?lon ." +
-    "?poi geo:geometry ?geo ." +
-    "FILTER (bif:st_intersects (?geo, bif:st_point (" + long + ", " + lat + "), " + radius + "))" +
+  var query = "SELECT * FROM <http://en.dbpedia.org> WHERE { " +
+    "?poi dbpprop:name ?name . " +
+    "?poi geo:lat ?lat . " +
+    "?poi geo:long ?lon . " +
+    "?poi geo:geometry ?geo . " +
+    "FILTER (bif:st_intersects (?geo, bif:st_point (" + long + ", " + lat + "), " + radius + ")) " +
   "} LIMIT 100"
-  du.sparqlSelect(query, {}, function(r) {
-    //alert(dumpObject(results, "r", 3));
-    var results = [];
-    results.forEach(function(r) {
-      results.push(new POI(r.name, r.lat, r.lon, null, r.poi));
+  du.sparqlSelect(query, {}, function(rs) {
+    //alert(dumpObject(rs, "rs", 3));
+    var results = rs.map(function(r) {
+      return new POI(r.name, r.lat, r.lon, null, r.poi);
+    });
+    resultCallback(results);
+  }, errorCallback);
+}
+
+function osmPOIs(lat, long, radius, resultCallback, errorCallback) {
+  var query = "SELECT * FROM <http://linkedgeodata.org> WHERE { " +
+    "?poi rdfs:label ?name . " +
+    "?poi geo:lat ?lat . " +
+    "?poi geo:long ?lon . " +
+    "?poi geo:geometry ?geo . " +
+    "FILTER (bif:st_intersects (?geo, bif:st_point (" + long + ", " + lat + "), " + radius + ")) " +
+  "} LIMIT 100"
+  du.sparqlSelect(query, {}, function(rs) {
+    //alert(dumpObject(rs, "rs", 3));
+    var results = rs.map(function(r) {
+      return new POI(r.name, r.lat, r.lon, null, r.poi);
     });
     resultCallback(results);
   }, errorCallback);
