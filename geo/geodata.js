@@ -23,7 +23,7 @@ POI.prototype = {
 * @param radius {Integer} in km
 */
 function dbpediaPOIs(lat, long, radius, resultCallback, errorCallback) {
-  var query = "SELECT * FROM <http://en.dbpedia.org> WHERE { " +
+  var query = "SELECT * FROM <http://dbpedia.org> WHERE { " +
     "?poi dbpprop:name ?name . " +
     "?poi geo:lat ?lat . " +
     "?poi geo:long ?lon . " +
