@@ -95,3 +95,27 @@ function insertAfter(parentElement, newElement, insertAfterEl) {
   }
   return newElement;
 }
+
+function Dropdown(selectE) {
+  selectE.o = this;
+  this.e = selectE;
+}
+Dropdown.prototype = {
+  addOptions : function(optionsMap) {
+    var first = true;
+    for (var id in optionsMap) {
+      var label = optionsMap[id];
+      var option = cE("option", null, {dataID : id, value: label });
+      option.appendChild(cTN(label));
+      this.e.appendChild(option);
+      if (first) {
+        option.setAttribute("selected", "true");
+        first = false;
+      }
+    }
+  },
+  getOption : function() {
+    var option = this.e.querySelector("option[selected]");
+    return option.dataID;
+  },
+}
