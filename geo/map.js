@@ -30,13 +30,21 @@ function onSearch(event) {
   };
   var resultCallback = function(places) {
     // Show results
-    gMap.showPOIs(places);
+    gMap.showPOIs(places, {
+        color: "blue",
+        solid: true,
+        layer: gMap.resultLayer,
+    });
 
     // Show POIs around this point
     var p = places[0];
     if (p) {
       osmPOIs(p.lat, p.long, 5, function(pois) {
-        gMap.showPOIs(pois);
+        //arrayRemove(pois, p);
+        gMap.showPOIs(pois, {
+            color: "green",
+            layer: gMap.poiLayer,
+        });
       }, errorNonCritical);
     }
   };

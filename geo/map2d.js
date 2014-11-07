@@ -38,8 +38,8 @@ function Map2D() {
   var layersControl = new L.Control.Layers().setPosition("topleft").addTo(map);
   layersControl.addBaseLayer(osmLayer, "Map");
   layersControl.addBaseLayer(satLayer, "Sat");
-  layersControl.addOverlay(resultLayer, "Found");
   layersControl.addOverlay(poiLayer, "Interesting");
+  layersControl.addOverlay(resultLayer, "Found");
 }
 Map2D.prototype = {
 
@@ -47,8 +47,14 @@ Map2D.prototype = {
     this.map.setView([lat, long], 10);
   },
 
-  showPOIs : function(pois) {
-    var layer = this.resultLayer;
+  /**
+   * @param pois {Array of {POI}}
+   * @params params.layer {Leaflet.Layer}   which layer to add it to
+   * @params params.color {String}   a CSS color
+   * @params params.style {JS Obj}   style properties for dots
+   */
+  showPOIs : function(pois, params) {
+    var layer = params.layer || this.resultLayer;
     layer.clearLayers();
     function highlightFeature(e) {
       try {
@@ -63,20 +69,25 @@ Map2D.prototype = {
       } catch (e) { p.errorCallback(e); }
     }
 
-    const lineOptions = {
-      weight: 2,
-      opacity: 0.7,
-      color: "yellow",
-    };
-    function featureOptions(layer) {
-      return {
-        fillColor: "blue", // TODO result vs. poi (make style per layer)
+    var style = {
+        fillColor: "blue",
         weight: 2,
         opacity: 0.7,
         color: "blue",
         fillOpacity: 0.5,
-      };
+    };
+    for (var p in params.style) {
+      style[p] = params.style[p];
     }
+    if (params.color) {
+      style.color = params.color;
+      style.fillColor = params.color;
+    }
+    if (params.solid) {
+      style.opacity = 1.0;
+      style.fillOpacity = 1.0;
+    }
+    // for touch events only
     const invisibleOptions = {
       weight: 0,
       opacity: 0,
@@ -92,7 +103,7 @@ Map2D.prototype = {
       //if (place.point) {
       var featureVisible = new L.CircleMarker(
           [ poi.lat, poi.long ],
-          featureOptions(layer));
+          style);
       featureVisible.setRadius(5); // px
       featureVisible.addTo(layer);
       // Make click target larger, for mobile
@@ -103,7 +114,7 @@ Map2D.prototype = {
       /*} else if (place.area) {
         feature = new L.Polygon(place.area.map(function(point) {
           return [ point.lat, point.long ];
-        }), featureOptions(poi));*/
+        }), style);*/
       feature.bindLabel(poi.name); // needs plugin Leaflet.label
       feature.poi = poi;
       feature.addTo(layer);
