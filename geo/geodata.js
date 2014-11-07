@@ -24,7 +24,7 @@ POI.prototype = {
 */
 function dbpediaPOIs(lat, long, radius, resultCallback, errorCallback) {
   var query = "SELECT * FROM <http://dbpedia.org> WHERE { " +
-    "?poi dbpprop:name ?name . " +
+    "?poi dbpediaprop:name ?name . " +
     "?poi geo:lat ?lat . " +
     "?poi geo:long ?lon . " +
     "?poi geo:geometry ?geo . " +
@@ -47,7 +47,7 @@ function osmPOIs(lat, long, radius, resultCallback, errorCallback) {
     "?poi geo:geometry ?geo . " +
     "FILTER (bif:st_intersects (?geo, bif:st_point (" + long + ", " + lat + "), " + radius + ")) " +
   "} LIMIT 100"
-  du.sparqlSelect(query, {}, function(rs) {
+  du.sparqlSelect(query, { endpoint: "openlinksw" }, function(rs) { // TODO m1 server
     //alert(dumpObject(rs, "rs", 3));
     var results = rs.map(function(r) {
       return new POI(r.name, r.lat, r.lon, null, r.poi);

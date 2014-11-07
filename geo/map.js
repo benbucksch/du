@@ -20,10 +20,6 @@ function onLoad() {
 
   var map = gMap = new Map2D();
   map.setPos(lat, long);
-
-  dbpediaPOIs(lat, long, 5, function(pois) {
-    map.showPOIs(pois);
-  }, errorNonCritical);
 }
 window.addEventListener("load", onLoad, false);
 
@@ -33,7 +29,16 @@ function onSearch(event) {
     errorCritical(e);
   };
   var resultCallback = function(places) {
+    // Show results
     gMap.showPOIs(places);
+
+    // Show POIs around this point
+    var p = places[0];
+    if (p) {
+      osmPOIs(p.lat, p.long, 5, function(pois) {
+        gMap.showPOIs(pois);
+      }, errorNonCritical);
+    }
   };
   var address = E("search-field").value;
   if ( !address) {

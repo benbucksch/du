@@ -135,6 +135,7 @@ function sparqlSelect(query, params, resultCallback, errorCallback) {
   } else {
     url = "/sparql/m1/";
   }
+  params.prefixes = params.prefixes || cRDFPrefixes;
   if (params.prefixes) {
     for (var prefix in params.prefixes) {
       if (query.indexOf(prefix + ":") != -1) {
@@ -142,6 +143,7 @@ function sparqlSelect(query, params, resultCallback, errorCallback) {
       }
     }
   }
+  ddebug("Running SPARQL query: " + query);
   loadURL({
     url : url,
     urlArgs : {
