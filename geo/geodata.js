@@ -47,7 +47,7 @@ function osmPOIs(lat, long, radius, resultCallback, errorCallback) {
     "?poi geo:geometry ?geo . " +
     "FILTER (bif:st_intersects (?geo, bif:st_point (" + long + ", " + lat + "), " + radius + ")) " +
   "} LIMIT 100"
-  du.sparqlSelect(query, { endpoint: "openlinksw" }, function(rs) { // TODO m1 server
+  du.sparqlSelect(query, {}, function(rs) {
     //alert(dumpObject(rs, "rs", 3));
     var results = rs.map(function(r) {
       return new POI(r.name, r.lat, r.lon, null, r.poi);
