@@ -39,7 +39,7 @@ function onSearch(event) {
     // Show POIs around this point
     var p = places[0];
     if (p) {
-      osmPOIs(p.lat, p.long, 5, function(pois) {
+      osmPOIs(p.lat, p.long, 2, function(pois) {
         //arrayRemove(pois, p);
         gMap.showPOIs(pois, {
             color: "green",

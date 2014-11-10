@@ -46,7 +46,7 @@ function osmPOIs(lat, long, radius, resultCallback, errorCallback) {
     "?poi geo:long ?lon . " +
     "?poi geo:geometry ?geo . " +
     "FILTER (bif:st_intersects (?geo, bif:st_point (" + long + ", " + lat + "), " + radius + ")) " +
-  "} LIMIT 100"
+  "} LIMIT 1000"
   du.sparqlSelect(query, {}, function(rs) {
     //alert(dumpObject(rs, "rs", 3));
     var results = rs.map(function(r) {
