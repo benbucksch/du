@@ -9,8 +9,8 @@
 function POI(name, lat, long, icon, id) {
   ddebug("POI " + name);
   this.name = name;
-  this.lat = lat;
-  this.long = long;
+  this.lat = parseFloat(lat);
+  this.long = parseFloat(long);
   this.icon = icon;
   this.id = id; // optional
 }
@@ -65,10 +65,54 @@ function osmXML(lat, long, latB, longB, resultCallback, errorCallback) {
     dataType: "xml",
     username: "xxx",
     password: "xxx",
-  }, function(xml) {
-    alert(xml);
-    resultCallback(xml);
+  }, function(xmlDOM) {
+    resultCallback(parseOSMXML(xmlDOM));
   }, errorCallback);
+}
+
+/**
+ * returns {
+ *   nodes {Array of POI} with additional .tags
+ *   ways {Array of way {
+ *     nodes {Array of POIs},
+ *     tags {Map of name {String} -> value {String}}
+ *   }
+ * }
+ */
+function parseOSMXML(xmlDOM) {
+  var osm = JXON.build(xmlDOM).osm;
+  var nodeByID = {};
+  var standaloneNodes = [];
+  var ways = [];
+  function parseTags(e) {
+    if ( !e.$tag) return {};
+    var tags = {};
+    e.$tag.forEach(function(tag) {
+      tags[tag["@k"]] = tag["@v"];
+    });
+    return tags;
+  }
+  //<node> -> POI
+  osm.$node.forEach(function(node) {
+    var poi = new POI(null, node["@lat"], node["@lon"], null, node["@id"]);
+    poi.tags = parseTags(node);
+    poi.name = poi.tags.name;
+    nodeByID[poi.id] = poi;
+    standaloneNodes.push(poi);
+  });
+  //<way> -> ways with Array of POI
+  osm.$way.forEach(function(way) {
+    ways.push({
+      nodes : way.$nd.map(function(nd) {
+        var node = nodeByID[nd["@ref"]];
+        arrayRemove(standaloneNodes, node);
+        return node;
+      }),
+      tags : parseTags(way),
+    });
+  });
+  alert(dumpObject(standaloneNodes, "node", 2) + dumpObject(ways, "way", 2));
+  return { nodes : standaloneNodes, ways : ways };
 }
 
 /**
