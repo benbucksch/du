@@ -385,7 +385,8 @@ function loadURL(params, successCallback, errorCallback) {
       return;
     }
     if (dataType == "xml") {
-      data = req.responseXML;
+      //data = req.responseXML;
+      data = new DOMParser().parseFromString(data, "text/xml");
     } else if (dataType == "html") {
       data = new DOMParser().parseFromString(data, "text/html");
     } else if (dataType == "json") {
