@@ -14,12 +14,16 @@ function onLoad() {
     }
   }, false);
 
+  var map = gMap = new Map2D();
+
   var params = parseURLQueryString(window.location.hash);
   var lat = params.lat || 51.330;
   var long = params.lon || 10.453;
-
-  var map = gMap = new Map2D();
   map.setPos(lat, long);
+  if (params.address) {
+    E("search-field").value = params.address;
+    onSearch();
+  }
 }
 window.addEventListener("load", onLoad, false);
 
