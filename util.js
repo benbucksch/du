@@ -268,8 +268,15 @@ function dumpObject(obj, name, maxDepth, curDepth)
 
 /**
  * @param url {String}   http[s]:// or file:///
- * @dataType {String-enum}  Expected type of file contents
+ * @param dataType {String-enum}  Expected type of file contents
  *    "text", "json", "xml" or "html"
+ * @param urlArgs {Map of name {String} -> value {String}}
+ *      extra URL param arguments
+ *      {name: "value", name2: "value" } -> "?name=value&name2=value2"
+ * @param headers {Map of name {String} -> value {String}}
+ *      extra HTTP headers
+ * @param username {String}   HTTP Basic auth: username
+ * @param password {String}   ditto - password
  * @param successCallback {Function(result)}
  *    result {String or Object or DOMDocument}
  * @param errorCallback {Function(e {Exception or Error})}
@@ -300,6 +307,12 @@ function loadURL(params, successCallback, errorCallback) {
     }
     mimetype += "; charset=UTF-8";
   //}
+
+  if (params.username && params.password) {
+    params.headers = params.headers || {};
+    params.headers.Authorization = "Basic " + window.btoa(
+        params.username + ":" + params.password);
+  }
 
   /*if (params.lib == "jquery") {
     $.getJSON(url, {
@@ -383,9 +396,16 @@ function loadURL(params, successCallback, errorCallback) {
     }
     successCallback(data);
   };
-  req.overrideMimeType("text/plain; charset=UTF-8");
   try {
+    req.overrideMimeType("text/plain; charset=UTF-8");
     req.open("GET", url, true); // async
+
+    for (var name in params.headers) {
+      var val = params.headers[name];
+      if ( !val) continue;
+      req.setRequestHeader(name, val);
+    }
+
     req.send();
   } catch (e) { // send() throws (!) when file:// URL and file not found
     errorCallback(e);
