@@ -56,6 +56,21 @@ function osmPOIs(lat, long, radius, resultCallback, errorCallback) {
   }, errorCallback);
 }
 
+function osmXML(lat, long, latB, longB, resultCallback, errorCallback) {
+  loadURL({
+    url: "http://api06.dev.openstreetmap.org/api/0.6/map",
+    urlArgs: {
+      bbox: long + "," + lat + "," + longB + "," + latB,
+    },
+    dataType: "xml",
+    username: "xxx",
+    password: "xxx",
+  }, function(xml) {
+    alert(xml);
+    resultCallback(xml);
+  }, errorCallback);
+}
+
 /**
  * @param address {string} a free-form street address
  * @param resultCallback {Function(Array of {POI})}
