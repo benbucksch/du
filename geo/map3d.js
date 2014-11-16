@@ -98,3 +98,10 @@ Map3D.prototype = {
     });
   }
 }
+
+
+
+function render(time) {
+  requestAnimationFrame(render);
+  TWEEN.update(time);
+}

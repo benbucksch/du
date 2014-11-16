@@ -59,9 +59,3 @@ function onSearch(event) {
   }
   searchAddress(address, resultCallback, errorCallback);
 }
-
-
-function render(time) {
-  requestAnimationFrame(render);
-  TWEEN.update(time);
-}
