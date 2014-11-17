@@ -43,7 +43,6 @@ function onSearch(event) {
     // Show POIs around this point
     var p = places[0];
     if (p) {
-      /*
       osmPOIs(p.lat, p.long, 2, function(pois) {
         //arrayRemove(pois, p);
         gMap.showPOIs(pois, {
@@ -51,14 +50,15 @@ function onSearch(event) {
             layer: gMap.poiLayer,
         });
       }, errorNonCritical);
-      */
 
+      /*
       osmXML(p.lat - 0.1, p.long - 0.1, p.lat + 0.1, p.long + 0.1, function(result) {
         gMap.showPOIs(result.nodes, {
-            color: "green",
+            color: "yellow",
             layer: gMap.poiLayer,
         });
       }, errorNonCritical);
+      */
     }
   };
   var address = E("search-field").value;
