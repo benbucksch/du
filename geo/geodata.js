@@ -130,7 +130,7 @@ function searchAddress(address, resultCallback, errorCallback) {
   }, function(json) {
     try {
       if (json.length == 0) {
-        errorCallback(new Exception("Nothing found"));
+        errorCallback(new NoResult());
         return;
       }
       var results = [];

@@ -474,3 +474,16 @@ SPARQLException.prototype =
 {
 }
 extend(SPARQLException, ServerException);
+
+/**
+ * The search had no results
+ */
+function NoResult(e)
+{
+  var msg = "No result"; // TODO localize
+  Exception.call(this, msg);
+}
+NoResult.prototype =
+{
+}
+extend(NoResult, Exception);
