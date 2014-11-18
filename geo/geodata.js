@@ -219,6 +219,7 @@ function enhancePOI(poi, resultCallback, errorCallback) {
       if ( !(e instanceof NoResult)) {
         errorCallback(e);
       }
+      resultCallback(poi);
     });
   }, errorCallback);
 }

@@ -102,6 +102,7 @@ function showPanelPOI(poi) {
   var poiE = cE("div", "poi");
   var typesE = cE("div", "types");
   typesE.appendChild(cTN(poi.types.join(", "))); // TODO translate
+  poiE.appendChild(typesE);
   if (poi.description) {
     var descrE = cE("div", "description");
     descrE.appendChild(cTN(poi.description.substr(0, 240)));
