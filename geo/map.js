@@ -75,11 +75,49 @@ function onSearch(event) {
   searchAddress(address, resultCallback, errorCallback);
 }
 
+/**
+ * Shows a panel describing the current POI:
+ * Mövenpick [bold title]
+ * Hotel, TourismThing
+ * Mövenpick is a large hotel chain originating in ....
+ * having 456 hotels around the world.
+ * More information [blue link]
+ */
 function updateInfoboxPOI(poi) {
-  // TODO show infobox
-  enhancePOI(poi, function() {
-  }, errorNonCritical);
+  showPanelPOI(poi);
+  if (poi.types.length == 0) {
+    enhancePOI(poi, function() {
+      showPanelPOI(poi);
+    }, errorNonCritical);
+  }
 }
+
+
+var gLastPOIPanel;
+
+function showPanelPOI(poi) {
+  if (gLastPOIPanel) {
+    gLastPOIPanel.close();
+  }
+  var poiE = cE("div", "poi");
+  var typesE = cE("div", "types");
+  typesE.appendChild(cTN(poi.types.join(", "))); // TODO translate
+  if (poi.description) {
+    var descrE = cE("div", "description");
+    descrE.appendChild(cTN(poi.description.substr(0, 240)));
+    poiE.appendChild(descrE);
+  }
+  var url = poi.appURL || poi.url;
+  if (url) {
+    var linkE = cE("a", "link");
+    linkE.appendChild(cTN("More information")); // TODO translate
+    linkE.setAttribute("href", url)
+    linkE.setAttribute("target", "_blank");
+    poiE.appendChild(linkE);
+  }
+  gLastPOIPanel = showPanel(poiE, poi.name);
+}
+
 
 function clickPOI(poi) {
   var url = poi.appURL || poi.url;
@@ -87,4 +125,28 @@ function clickPOI(poi) {
     window.open(url);
     return;
   }
+}
+
+/**
+ * @param panelE {<div>}  The panel contents to show.
+ *      No frame, border or anything.
++ *      E.g. a list of layers
+ * @return { close() {Function} }
+ */
+function showPanel(panelE, title) {
+  var parentE = document.querySelector("div.leaflet-top.leaflet-left");
+  assert(parentE, "Leaflet control panel not found");
+  var controlE = cE("div", "leaflet-control");
+  controlE.classList.add("leaflet-bar");
+  controlE.classList.add("control-panel");
+  var titleE = cE("h1");
+  titleE.appendChild(cTN(title));
+  controlE.appendChild(titleE);
+  controlE.appendChild(panelE);
+  parentE.appendChild(controlE);
+  return {
+    close: function() {
+      removeElement(controlE);
+    },
+  };
 }

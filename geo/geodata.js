@@ -13,6 +13,7 @@ function POI(name, lat, long, icon, id) {
   this.long = parseFloat(long);
   this.icon = icon;
   this.id = id; // optional
+  this.types = []; // optional
 }
 POI.prototype = {
 }
@@ -184,11 +185,11 @@ function enhancePOI(poi, resultCallback, errorCallback) {
   "} LIMIT 20";
   du.sparqlSelect(query, {}, function(rs) {
     poi.types = rs.map(function(result) {
-      return result.type;
+      return result.type.replace("http://linkedgeodata.org/ontology/", "");
+    }).filter(function(type) {
+      return type.substr(0, 4) != "http";
     });
     poi.types.forEach(function(type) {
-      type = type.replace("http://linkedgeodata.org/ontology/", "");
-      if (type.substr(0, 4) == "http") { return; }
       ddebug("POI " + poi.name + " has type " + type);
       switch (type) {
         case "Airport":
@@ -204,15 +205,21 @@ function enhancePOI(poi, resultCallback, errorCallback) {
       ddebug("POI " + poi.name + " has URL " + poi.url);
     }
 
-    var query = "SELECT * FROM <http://dbpedia.org> WHERE {" +
-      esc(dbpediaID(poi.name)) + " rdfs:label ?name ; " +
-        "rdfs:comment ?abstract ; " +
-        "dbpedia-owl:wikiPageExternalLink ?url . " +
-      "FILTER(langMatches(lang(?abstract), '" + getLang() + "'))   }";
+    var query = "SELECT * FROM <http://dbpedia.org> WHERE { " +
+        "OPTIONAL { " + esc(dbpediaID(poi.name)) + " rdfs:comment ?description . } " +
+        "OPTIONAL { " + esc(dbpediaID(poi.name)) + " dbpedia-owl:wikiPageExternalLink ?url . } " +
+      "FILTER(langMatches(lang(?description), '" + getLang() + "'))   }";
     sparqlSelect1(query, {}, function(result) {
-      poi.abstract = result.abstract;
+      poi.description = result.description;
       poi.url = poi.url || result.url;
-    }, errorCallback);
+      ddebug(poi.name + " <" + poi.url + ">");
+      ddebug(poi.name + ": " + poi.description);
+      resultCallback(poi);
+    }, function(e) {
+      if ( !(e instanceof NoResult)) {
+        errorCallback(e);
+      }
+    });
   }, errorCallback);
 }
 
