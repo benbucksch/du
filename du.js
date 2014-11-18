@@ -25,6 +25,9 @@ function openTopic(topic) {
 function startupTopic() {
   var params = parseURLQueryString(window.location.search);
   gSite = params.site || window.location.hostname;
+  if (gSite == "www.manyone.zone") {
+    params.siteWords = "Digital Universe";
+  }
   var title = params.siteWords || gSite;
   openTopic({ // Fake topic
     title : title,
