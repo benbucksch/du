@@ -146,3 +146,84 @@ function searchAddress(address, resultCallback, errorCallback) {
     } catch (e) { errorCallback(e); }
   }, function(e) { errorCallback(e); });
 }
+
+/**
+ * @see enhancePOI()
+ * @param pois {Array of {POI}}  modified in-place
+ * @param resultCallback {Function(pois)}
+ */
+function enhancePOIs(pois, resultCallback, errorCallback) {
+  var waiting = pois.length;
+  var hadError = false;
+  var done = false;
+  pois.forEach(function(poi) {
+    enhancePOI(poi, function() {
+      if ( !--waiting) {
+        done = true;
+        resultCallback(pois);
+      }
+    }, function(e) {
+      if (hadError) { return; }
+      hadError = true;
+      errorCallback(e);
+    });
+  });
+}
+
+/**
+ * For the POI, tries to find:
+ * - DU topic
+ * - dbpedia entry
+ * - class
+ * @param poi {POI}  modified in-place
+ * @param resultCallback {Function(poi)}
+ */
+function enhancePOI(poi, resultCallback, errorCallback) {
+  var query = "SELECT * FROM <http://linkedgeodata.org> WHERE {" +
+    "<" + poi.id + "> a ?type ." +
+  "} LIMIT 20";
+  du.sparqlSelect(query, {}, function(rs) {
+    poi.types = rs.map(function(result) {
+      return result.type;
+    });
+    poi.types.forEach(function(type) {
+      type = type.replace("http://linkedgeodata.org/ontology/", "");
+      if (type.substr(0, 4) == "http") { return; }
+      ddebug("POI " + poi.name + " has type " + type);
+      switch (type) {
+        case "Airport":
+          //poi.topic = uninav.findTopicByTitle("Airplane");
+          return;
+        case "Hotel":
+          poi.appURL = makeHotelURL(poi);
+          return;
+      }
+    });
+    poi.url = poi.url || poi.appURL;
+    if (poi.url) {
+      ddebug("POI " + poi.name + " has URL " + poi.url);
+    }
+
+    var query = "SELECT * FROM <http://dbpedia.org> WHERE {" +
+      esc(dbpediaID(poi.name)) + " rdfs:label ?name ; " +
+        "rdfs:comment ?abstract ; " +
+        "dbpedia-owl:wikiPageExternalLink ?url . " +
+      "FILTER(langMatches(lang(?abstract), '" + getLang() + "'))   }";
+    sparqlSelect1(query, {}, function(result) {
+      poi.abstract = result.abstract;
+      poi.url = poi.url || result.url;
+    }, errorCallback);
+  }, errorCallback);
+}
+
+function makeHotelURL(poi) {
+  // @see https://admin.booking.com/affiliate/impl_param.html
+  return createURLQueryString("http://www.booking.com/searchresults.html", {
+    aid : 804593, // affiliate ID
+    si : "ho", // Hotels
+    ss : poi.name,
+    latitude : poi.lat,
+    longitude : poi.long,
+    radius : 1,
+  });
+}

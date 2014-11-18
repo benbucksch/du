@@ -38,6 +38,9 @@ function onSearch(event) {
         color: "blue",
         solid: true,
         layer: gMap.resultLayer,
+        onHighlight : updateInfoboxPOI,
+        onClick : clickPOI,
+        errorCallback : errorCritical,
     });
 
     // Show POIs around this point
@@ -48,6 +51,9 @@ function onSearch(event) {
         gMap.showPOIs(pois, {
             color: "green",
             layer: gMap.poiLayer,
+            onHighlight : updateInfoboxPOI,
+            onClick : clickPOI,
+            errorCallback : errorCritical,
         });
       }, errorNonCritical);
 
@@ -67,4 +73,18 @@ function onSearch(event) {
     return;
   }
   searchAddress(address, resultCallback, errorCallback);
+}
+
+function updateInfoboxPOI(poi) {
+  // TODO show infobox
+  enhancePOI(poi, function() {
+  }, errorNonCritical);
+}
+
+function clickPOI(poi) {
+  var url = poi.appURL || poi.url;
+  if (url) {
+    window.open(url);
+    return;
+  }
 }

@@ -52,6 +52,9 @@ Map2D.prototype = {
    * @params params.layer {Leaflet.Layer}   which layer to add it to
    * @params params.color {String}   a CSS color
    * @params params.style {JS Obj}   style properties for dots
+   * @params params.onHighlight {Function(poi)}   on mouseover
+   * @params params.onUnhighlight {Function(poi)}   on mouseleave
+   * @params params.onClick {Function(poi)}   on mouse click
    */
   showPOIs : function(pois, params) {
     var layer = params.layer || this.resultLayer;
@@ -59,14 +62,30 @@ Map2D.prototype = {
     function highlightFeature(e) {
       try {
         var feature = e.target;
-        updateInfobox(feature.poi);
-      } catch (e) { p.errorCallback(e); }
+        var poi = feature.poi;
+        if (params.onHighlight) {
+          params.onHighlight(poi);
+        }
+      } catch (e) { params.errorCallback(e); }
     }
     function unhighlightFeature(e) {
       try {
         var feature = e.target;
-        updateInfobox(feature.poi);
-      } catch (e) { p.errorCallback(e); }
+        var poi = feature.poi;
+        if (params.onUnhighlight) {
+          params.onUnhighlight(poi);
+        }
+      } catch (e) { params.errorCallback(e); }
+    }
+    function clickFeature(e) {
+      try {
+        var feature = e.target;
+        var poi = feature.poi;
+        ddebug(poi.name + " clicked");
+        if (params.onClick) {
+          params.onClick(poi);
+        }
+      } catch (e) { params.errorCallback(e); }
     }
 
     var style = {
@@ -122,7 +141,7 @@ Map2D.prototype = {
       feature.on({
           mouseover : highlightFeature,
           mouseout : unhighlightFeature,
-          click : highlightFeature,
+          click : clickFeature,
       });
     }
 
@@ -135,9 +154,4 @@ Map2D.prototype = {
       this.map.setZoom(14);
     }
   }
-}
-
-
-function updateInfobox(poi) {
-  // TODO
 }

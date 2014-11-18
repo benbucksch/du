@@ -1,6 +1,7 @@
 var gSite;
 var gTopic;
 var du = this;
+var uninav; // set by uninav.js
 
 /**
  * Change to go to another DU topic.
@@ -31,20 +32,15 @@ function startupTopic() {
   var title = params.siteWords || gSite;
   openTopic({ // Fake topic
     title : title,
-    dbpediaID : title.split(" ")[0],
+    lodID : "dbpedia:" + title.split(" ")[0],
   });
 }
 
-function dbpediaID(topic) {
-  if ( !topic.dbpediaID) {
-    var title = topic.title
-        .replace(/ \&.*/g, "") // HACK: With "A&B", take only A
-        .replace(/, .*/g, "") // HACK: With "A, B & C", take only A
-        .replace(/ /g, "_"); // Spaces -> _
-    title = title[0] + title.substr(1).toLowerCase(); // Double words in lowercase
-    topic.dbpediaID = title;
+function dbpediaIDForTopic(topic) {
+  if ( !topic.lodID) {
+    topic.lodID = dbpediaID(topic.title);
   }
-  return "dbpedia:" + topic.dbpediaID;
+  return topic.lodID;
 }
 
 Ext.application({
@@ -183,7 +179,7 @@ function loadActivityDefault(topic) {
 function loadActivityLearn(topic) {
   Ext.getCmp("content-pane").removeAll(); // clear old content
   var query = "SELECT ?abstract FROM <http://dbpedia.org> WHERE {" +
-    esc(dbpediaID(topic)) + " dbpedia-owl:abstract ?abstract" + " . " +
+    esc(dbpediaIDForTopic(topic)) + " dbpedia-owl:abstract ?abstract" + " . " +
     "filter(langMatches(lang(?abstract), '" + getLang() + "'))" + // one lang
   "}";
   sparqlSelect1(query, {}, function(result) {
@@ -194,7 +190,7 @@ function loadActivityLearn(topic) {
 }
 
 function loadActivityUnderstand(topic) {
-  var page = dbpediaID(topic).replace("dbpedia:", "");
+  var page = dbpediaIDForTopic(topic).replace("dbpedia:", "");
   loadContentPage(
       "http://en.m.wikipedia.org/wiki/" + encodeURIComponent(page),
       "Understand " + topic.title);
@@ -234,7 +230,7 @@ function getLocation(topic, resultCallback, errorCallback) {
     return;
   }
   var query = "SELECT * FROM <http://dbpedia.org> WHERE {" +
-    esc(dbpediaID(topic)) + " geo:lat ?lat ; " +
+    esc(dbpediaIDForTopic(topic)) + " geo:lat ?lat ; " +
     " geo:long ?lon . " +
   "}";
   sparqlSelect1(query, {}, function(result) {

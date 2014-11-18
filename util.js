@@ -96,6 +96,14 @@ function parseURLQueryString(queryString)
   return queryParams;
 }
 
+function createURLQueryString(url, args) {
+  for (var name in args) {
+    url += (url.indexOf("?") == -1 ? "?" : "&") +
+            name + "=" + encodeURIComponent(args[name]);
+  }
+  return url;
+}
+
 
 function getLang() {
   return "en";
@@ -108,6 +116,16 @@ function esc(str) {
     .replace(/\&/g, "and")
     .replace(/\"/g, "'")
     .replace(/ /g, "_");
+    // TODO escape "()," etc.
+}
+
+function dbpediaID(title) {
+  title = title
+      .replace(/ \&.*/g, "") // HACK: With "A&B", take only A
+      .replace(/, .*/g, "") // HACK: With "A, B & C", take only A
+      .replace(/ /g, "_"); // Spaces -> _
+  title = title[0] + title.substr(1).toLowerCase(); // Double words in lowercase
+  return "dbpedia:" + title;
 }
 
 var cRDFPrefixes = {
@@ -118,6 +136,8 @@ var cRDFPrefixes = {
   dbpedia: "http://dbpedia.org/resource/",
   dbpediaprop: "http://dbpedia.org/property/",
   dbpediaowl: "http://dbpedia.org/ontology/",
+  "dbpedia-prop": "http://dbpedia.org/property/",
+  "dbpedia-owl": "http://dbpedia.org/ontology/",
   geo: "http://www.w3.org/2003/01/geo/wgs84_pos#",
   geonames: "http://www.geonames.org/ontology#",
   freebase: "http://rdf.freebase.com/ns/",
