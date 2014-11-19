@@ -187,7 +187,7 @@ function enhancePOI(poi, resultCallback, errorCallback) {
     poi.types = rs.map(function(result) {
       return result.type.replace("http://linkedgeodata.org/ontology/", "");
     }).filter(function(type) {
-      return type.substr(0, 4) != "http";
+      return type.substr(0, 4) != "http" && type != "Amenity";
     });
     poi.types.forEach(function(type) {
       ddebug("POI " + poi.name + " has type " + type);
