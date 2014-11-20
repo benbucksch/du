@@ -177,7 +177,7 @@ function nameForArea(lat, long, zoomLevel, resultCallback, errorCallback) {
         return;
       }
       var poi = new POI(
-            json.address.city || json.address.town || json.address.state || json.address.country,
+            json.address.city || json.address.town || json.address.village || json.address.state || json.address.country,
             lat, long,
             null, // icon
             json.place_id);
