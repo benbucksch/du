@@ -149,6 +149,45 @@ function searchAddress(address, resultCallback, errorCallback) {
 }
 
 /**
+ * Reverse Geocoding
+ * For a given geographical location or area, finds the
+ * most fitting place name, e.g. adminstrative area.
+ * E.g. "Wiesbaden" or "Germany", depending on area size.
+ * @param zoomLevel {Integer}  0-18 leaflet/OpenLayers zoom level
+ *     Result will change based on the zoom level
+ * @param resultCallback {Function()}
+ *
+ * @see http://wiki.openstreetmap.org/wiki/Nominatim#Reverse_Geocoding_.2F_Address_lookup
+ */
+function nameForArea(lat, long, zoomLevel, resultCallback, errorCallback) {
+  loadURL({
+    url : "http://www.manyone.zone/geo/reverse",
+    urlArgs : {
+      lat : lat,
+      lon : long,
+      zoom : zoomLevel,
+      addressdetails : 1,
+      format : "json",
+    },
+    dataType : "json",
+  }, function(json) {
+    try {
+      if (json.error) {
+        errorCallback(new Exception(json.error));
+        return;
+      }
+      var poi = new POI(
+            json.address.city || json.address.town || json.address.state || json.address.country,
+            lat, long,
+            null, // icon
+            json.place_id);
+      poi.address = json.address; // city, county, state, country, country_code
+      resultCallback(poi);
+    } catch (e) { errorCallback(e); }
+  }, function(e) { errorCallback(e); });
+}
+
+/**
  * @see enhancePOI()
  * @param pois {Array of {POI}}  modified in-place
  * @param resultCallback {Function(pois)}

@@ -24,6 +24,17 @@ function onLoad() {
     E("search-field").value = params.address;
     onSearch();
   }
+
+  var appTitle = document.title;
+  map.onMove(function(latCenter, longCenter, zoomLevel,
+      latNorth, longWest, latSouth, longEast) {
+    ddebug("Location " + latCenter + ", " + longCenter + ", zoom " + zoomLevel);
+    zoomLevel -= 5; // apparently leaflet and Nominatim zoom levels don't match
+    nameForArea(latCenter, longCenter, zoomLevel + 3, function(loc) {
+      ddebug("Moved to " + dumpObject(loc, "loc", 3));
+      document.title = loc.name + " - " + appTitle;
+    }, errorNonCritical);
+  });
 }
 window.addEventListener("load", onLoad, false);
 

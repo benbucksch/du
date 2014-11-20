@@ -48,6 +48,26 @@ Map2D.prototype = {
   },
 
   /**
+   * Add event listener that's called when the visible map area changes,
+   * either by panning or zooming.
+   * @param func {Function(latCenter, longCenter, zoomLevel,
+   *      latNorth, longWest, latSouth, longEast)}
+   */
+  onMove : function(func) {
+    var map = this.map;
+    this.map.on("moveend", function(e) {
+      var center = map.getCenter();
+      var zoomLevel = map.getZoom();
+      var bounds = map.getBounds();
+      try {
+        func(center.lat, center.lng, zoomLevel,
+            bounds.getNorth(), bounds.getWest(),
+            bounds.getSouth(), bounds.getEast());
+      } catch (e) { errorNonCritical(e); }
+    });
+  },
+
+  /**
    * @param pois {Array of {POI}}
    * @params params.layer {Leaflet.Layer}   which layer to add it to
    * @params params.color {String}   a CSS color
