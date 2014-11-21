@@ -115,8 +115,9 @@ function esc(str) {
   return str
     .replace(/\&/g, "and")
     .replace(/\"/g, "'")
-    .replace(/ /g, "_");
-    // TODO escape "()," etc.
+    .replace(/ /g, "_")
+    .replace(/\(/g, "%28") // TODO doesn't work, neither does \\u28
+    .replace(/\)/g, "%29");
 }
 
 function dbpediaID(title) {
