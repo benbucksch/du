@@ -12,12 +12,35 @@ var uninav; // set by uninav.js
  * Currently called directly from uninav iframe.
  * This direction function call works, because it's the same domain.
  * Alternative: events sent via postMessage(), see below.
+ * @param topic {Topic}
+ * @param changeMode {Integer-Enum}
+ *     if 0, it comes from UniNav and we change activities and content
+ *     if 1, the change comes from content (animation, geo etc.),
+ *     and a complete change is wanted, similar to a normal link click.
+ *     The content and activity *shall* be changed,
+ *     if 2, the change comes from content (animation, geo etc.).
+ *     The content shall *not* be changed, i,e. no default activity loaded,
+ *     but the topic in UniNav changes and the activity bar content changes.
+ *     I.e. this is a "seamless" topic change, where only the
+ *     information in the side frames changes, but the content
+ *     stays as-is.
  */
-function openTopic(topic) {
+function openTopic(topic, changeMode) {
+  changeMode = changeMode || 0;
+
   gTopic = topic;
-  Ext.getCmp("content-pane").removeAll();
   Ext.getCmp("content-pane").setTitle(topic.title);
-  loadActivityDefault(topic);
+
+  if (changeMode == 0 || changeMode == 1) {
+    // Change content
+    Ext.getCmp("content-pane").removeAll();
+    loadActivityDefault(topic);
+  }
+  if (changeMode == 1 || changeMode == 2) {
+    // Change UniNav
+    //var uninav = E("uninav").contentWindow;
+    uninav.showTopic(topic);
+  }
 }
 
 /**
@@ -53,6 +76,7 @@ Ext.application({
 
 function createUI() {
   var uninav = Ext.create('Ext.Component', {
+    id: "uninav",
     autoEl: {
         tag: 'iframe',
         src: "../uninav/uninav.html",
