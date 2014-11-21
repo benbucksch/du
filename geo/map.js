@@ -33,6 +33,40 @@ function onLoad() {
     nameForArea(latCenter, longCenter, zoomLevel + 3, function(loc) {
       ddebug("Moved to " + dumpObject(loc, "loc", 3));
       document.title = loc.name + " - " + appTitle;
+
+      var uninav = du.uninav;
+      assert(uninav && uninav.Topic, "uninav not found");
+      // Find country topic in taxonomy and add this City as new topic
+      var addr = loc.address;
+      var tCountry = uninav.findTopicByTitle(addr.country);
+      assert(tCountry, "country " + addr.country + " not found");
+      var tLowest = tCountry;
+      if (addr.state) {
+        var stateID = tCountry.id + addr.state;
+        var tState = uninav.findTopicByID(stateID); // reuse existing
+        if ( !tState) {
+          tState = new uninav.Topic();
+          tState.title = addr.state;
+          tState.id = stateID;
+          tState.img = "manyone.png";
+          tState.addToParent(tCountry);
+        }
+        tLowest = tState;
+      }
+      if (addr.city) {
+        var cityID = tCountry.id + addr.city;
+        var tCity = uninav.findTopicByID(cityID); // reuse existing
+        if ( !tCity) {
+          var tCity = new uninav.Topic();
+          tCity.title = addr.city;
+          tCity.id = cityID;
+          tCity.img = "manyone.png";
+          tCity.addToParent(tLowest);
+        }
+        tLowest = tCity;
+      }
+
+      du.openTopic(tLowest, 2);
     }, errorNonCritical);
   });
 }

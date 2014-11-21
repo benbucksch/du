@@ -176,8 +176,12 @@ function nameForArea(lat, long, zoomLevel, resultCallback, errorCallback) {
         errorCallback(new Exception(json.error));
         return;
       }
+      if ( !json.address.city && json.address.town || json.address.village) {
+        json.address.city = json.address.town || json.address.village;
+      }
+      var name = json.address.city || json.address.state || json.address.country;
       var poi = new POI(
-            json.address.city || json.address.town || json.address.village || json.address.state || json.address.country,
+            name,
             lat, long,
             null, // icon
             json.place_id);
