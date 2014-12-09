@@ -139,9 +139,11 @@ var cRDFPrefixes = {
   dbpediaowl: "http://dbpedia.org/ontology/",
   "dbpedia-prop": "http://dbpedia.org/property/",
   "dbpedia-owl": "http://dbpedia.org/ontology/",
+  //freebase: "http://rdf.freebase.com/ns/",
+  freebase: "http://rdf.basekb.com/ns/",
   geo: "http://www.w3.org/2003/01/geo/wgs84_pos#",
   geonames: "http://www.geonames.org/ontology#",
-  freebase: "http://rdf.freebase.com/ns/",
+  factbook: "http://wifo5-04.informatik.uni-mannheim.de/factbook/ns#",
   owl: "http://www.w3.org/2002/07/owl#",
   skos: "http://www.w3.org/2004/02/skos/core#",
 };

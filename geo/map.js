@@ -23,6 +23,10 @@ function onLoad() {
   if (params.address) {
     E("search-field").value = params.address;
     onSearch();
+  } else if (params.statsFor) {
+    showStats(params.statsFor, function(areas) {
+      map.showPOIs(areas, {});
+    }, errorCritical);
   }
 
   var appTitle = document.title;

@@ -18,6 +18,25 @@ function POI(name, lat, long, icon, id) {
 POI.prototype = {
 }
 
+function Area(name, id) {
+  ddebug("Area " + name);
+  this.name = name;
+  this.id = id; // optional
+  this.polygon = [];
+}
+Area.prototype = {
+  /**
+   * { Array of {lat {float}, long {float}}}
+   */
+  polygon : null,
+  addPoint : function(lat, long) {
+    this.polygon.push({ lat: parseFloat(lat), long: parseFloat(long) });
+  },
+  finished : function() {
+  },
+}
+
+
 /**
 * Find interesting points around the position,
 * using dbpedia

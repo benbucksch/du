@@ -72,6 +72,7 @@ Map2D.prototype = {
    * @params params.layer {Leaflet.Layer}   which layer to add it to
    * @params params.color {String}   a CSS color
    * @params params.style {JS Obj}   style properties for dots
+   * @params params.zoom {Boolean}   (default true) zoom to all POIs
    * @params params.onHighlight {Function(poi)}   on mouseover
    * @params params.onUnhighlight {Function(poi)}   on mouseleave
    * @params params.onClick {Function(poi)}   on mouse click
@@ -137,23 +138,29 @@ Map2D.prototype = {
 
     var totalBounds = new L.LatLngBounds();
 
-    function makeFeatureFromPOI(poi) {
+    pois.forEach(function makeFeatureFromPOI(poi) {
+      if (poi.color && poi.colorCSS) {
+        ddebug("color " + poi.colorCSS + " alpha " + poi.color.a);
+        style.color = style.fillColor = poi.colorCSS;
+        style.fillOpacity = poi.color.a;
+      }
       var feature;
-      //if (place.point) {
-      var featureVisible = new L.CircleMarker(
-          [ poi.lat, poi.long ],
-          style);
-      featureVisible.setRadius(5); // px
-      featureVisible.addTo(layer);
-      // Make click target larger, for mobile
-      feature = new L.CircleMarker(
-          [ poi.lat, poi.long ],
-          invisibleOptions);
-      feature.setRadius(10); // px
-      /*} else if (place.area) {
-        feature = new L.Polygon(place.area.map(function(point) {
+      if (poi.polygon) {
+        feature = new L.Polygon(poi.polygon.map(function(point) {
           return [ point.lat, point.long ];
-        }), style);*/
+        }), style);
+      } else {
+        var featureVisible = new L.CircleMarker(
+            [ poi.lat, poi.long ],
+            style);
+        featureVisible.setRadius(5); // px
+        featureVisible.addTo(layer);
+        // Make click target larger, for mobile
+        feature = new L.CircleMarker(
+            [ poi.lat, poi.long ],
+            invisibleOptions);
+        feature.setRadius(10); // px
+      }
       feature.bindLabel(poi.name); // needs plugin Leaflet.label
       feature.poi = poi;
       feature.addTo(layer);
@@ -163,15 +170,16 @@ Map2D.prototype = {
           mouseout : unhighlightFeature,
           click : clickFeature,
       });
-    }
+    });
 
-    pois.forEach(makeFeatureFromPOI);
-
-    // place and zoom map based on features shown
-    this.map.fitBounds(totalBounds);
-    // max zoom, but only for automatic zoom
-    if (this.map.getZoom() > 14) {
-      this.map.setZoom(14);
+    if ((params.zoom || params.zoom == undefined) &&
+        totalBounds.isValid()) {
+      // place and zoom map based on features shown
+      this.map.fitBounds(totalBounds);
+      // max zoom, but only for automatic zoom
+      if (this.map.getZoom() > 14) {
+        this.map.setZoom(14);
+      }
     }
-  }
+  },
 }
