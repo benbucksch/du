@@ -25,7 +25,15 @@ function onLoad() {
     onSearch();
   } else if (params.statsFor) {
     showStats(params.statsFor, function(areas) {
-      map.showPOIs(areas, {});
+      map.showPOIs(areas, {
+        onClick : function(feature) {
+          var topic = du.uninav.findTopicByTitle(feature.name);
+          assert(topic, feature.name + " not found in DU taxonomy");
+          du.openTopic(topic, 2);
+        },
+        errorCallback : errorCritical,
+        zoom : false,
+      });
     }, errorCritical);
   }
 
