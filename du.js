@@ -202,9 +202,9 @@ function loadActivityDefault(topic) {
 
 function loadActivityLearn(topic) {
   Ext.getCmp("content-pane").removeAll(); // clear old content
-  var query = "SELECT ?abstract FROM <http://dbpedia.org> WHERE {" +
-    esc(dbpediaIDForTopic(topic)) + " dbpedia-owl:abstract ?abstract" + " . " +
-    "filter(langMatches(lang(?abstract), '" + getLang() + "'))" + // one lang
+  var query = "SELECT ?abstract FROM <http://dbpedia.org> WHERE { " +
+    esc(dbpediaIDForTopic(topic)) + " dbpedia-owl:abstract ?abstract . " +
+    "filter(langMatches(lang(?abstract), '" + getLang() + "')) " + // one lang
   "}";
   sparqlSelect1(query, {}, function(result) {
     var abstract = result.abstract;
