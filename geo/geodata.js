@@ -23,6 +23,7 @@ function Area(name, id) {
   this.name = name;
   this.id = id; // optional
   this.polygon = [];
+  this.geoJSON = null;
 }
 Area.prototype = {
   /**

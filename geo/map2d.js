@@ -140,12 +140,15 @@ Map2D.prototype = {
 
     pois.forEach(function makeFeatureFromPOI(poi) {
       if (poi.color && poi.colorCSS) {
-        ddebug("color " + poi.colorCSS + " alpha " + poi.color.a);
+        //ddebug("color " + poi.colorCSS + " alpha " + poi.color.a);
         style.color = style.fillColor = poi.colorCSS;
         style.fillOpacity = poi.color.a;
       }
       var feature;
-      if (poi.polygon) {
+      if (poi.geoJSON) {
+        feature = L.GeoJSON.geometryToLayer(poi.geoJSON);
+        feature.setStyle(style);
+      } else if (poi.polygon) {
         feature = new L.Polygon(poi.polygon.map(function(point) {
           return [ point.lat, point.long ];
         }), style);

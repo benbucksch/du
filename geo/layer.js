@@ -28,6 +28,27 @@ function showStats(property, resultCallback, errorCallback) {
 
 /**
  * Get a list of geographical areas (e.g. countries, regions, cities)
+ *   from GeoJSON, including polygons
+ * @param resultCallback {Function(countries {Array of {Area})}
+ * @param errorCallback {Function(e)}
+ * whereby country.id = ISO 3166-2 country code, in upper case, e.g. "DE"
+ */
+function layerFetchCountries(resultCallback, errorCallback) {
+  loadURL({ url : "countries.geo.json", dataType: "json" }, function(json) {
+    var countries = json.features.map(function(result) {
+      assert(result.id, "Need country code");
+      var c = new Area(result.properties.name, result.id.toUpperCase());
+      c.code = c.id;
+      c.geoJSON = result;
+      return c;
+    });
+    ddebug("Have " + countries.length + " countries");
+    resultCallback(countries);
+  }, errorCallback);
+}
+
+/**
+ * Get a list of geographical areas (e.g. countries, regions, cities)
  *   from geonames LOD, including polygons
  * @param resultCallback {Function(countries {Array of {Area})}
  * @param errorCallback {Function(e)}
@@ -35,7 +56,7 @@ function showStats(property, resultCallback, errorCallback) {
  * whereby country.id = Geonames ID
  * and country.code = ISO 3166-2 country code, in upper case, e.g. "DE"
  */
-function layerFetchCountries(resultCallback, errorCallback) {
+function layerFetchCountriesFromGeonames(resultCallback, errorCallback) {
   var query = "SELECT * FROM <http://geonames.org> WHERE { " +
     "?country geonames:featureCode geonames:A.PCLI . " +
     "?country geonames:countryCode ?code . " +
@@ -87,24 +108,34 @@ function layerFetchValuesForCountries(countries, property,
                                       resultCallback, errorCallback) {
   assert(countries[0] && countries[0].code, "No country");
   var countryMap = {}; // code {String} -> country
+  var countryNameMap = {}; // name {String} -> country
   countries.forEach(function(c) {
     countryMap[c.code] = c;
+    countryNameMap[c.name] = c;
   });
 
   var query = "SELECT * WHERE { " +
     "?country a factbook:Country . " +
     "?country factbook:internetcountrycode ?domain . " +
+    "OPTIONAL { ?country factbook:name ?name } . " +
     "?country " + property + " ?value . " +
   "} LIMIT 300";
   du.sparqlSelect(query, { endpoint : "factbook" }, function(rs) {
     //ddebug("have " + rs.length + " results with values");
     rs.forEach(function(result) {
-      result.code = result.domain.substr(1).toUpperCase();
+      result.code = result.domain.split(";")[0].substr(1).toUpperCase();
       //ddebug("code " + result.code + " domain " + result.domain);
       var c = countryMap[result.code];
+      if ( !c) {
+        c = countryNameMap[result.name];
+      }
+      if ( !c) {
+        ddebug("Country " + result.code + " " + result.name + " NOT FOUND");
+        return;
+      }
       if ( !c) return;
       c.value = parseFloat(result.value);
-      ddebug("country " + c.name + " " + property + " " + c.value);
+      //ddebug("country " + c.name + " " + property + " " + c.value);
     });
     countries = countries.filter(function(c) {
       return c.value != undefined && !isNaN(c.value);
