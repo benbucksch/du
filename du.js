@@ -203,13 +203,22 @@ function createUI() {
 
 /**
  * Decides which activity to load for a given topic
+ *
+ * Try, in order:
+ * - Explore (animation)
+ * - Geo (Map)
+ * - Unterstand (Wikipedia)
  */
 function loadActivityDefault(topic) {
-  getLocation(topic, function() { // have location
-    loadActivityGeo(topic);
-  }, function(e) { // no location found
-    loadActivityUnderstand(topic);
-  });
+  if (haveActivityExplore(topic)) {
+    loadActivityExplore(topic);
+  } else {
+    haveActivityGeo(topic, function() {
+      loadActivityGeo(topic);
+    }, function(e) { // no geo location found
+      loadActivityUnderstand(topic);
+    });
+  }
 }
 
 function loadActivityLearn(topic) {
@@ -223,6 +232,14 @@ function loadActivityLearn(topic) {
     assert(abstract, "No abstract found for: " + topic.title);
     Ext.getCmp("content-pane").update(abstract); // sets content
   }, errorCritical);
+}
+
+function haveActivityExplore(topic) {
+  return !!topic.exploreURL;
+}
+
+function loadActivityExplore(topic) {
+  loadContentPage(topic.exploreURL, "Explore " + topic.title);
 }
 
 function loadActivityUnderstand(topic) {
@@ -254,13 +271,17 @@ function loadActivityNews(topic) {
 
 function loadActivityGeo(topic) {
   Ext.getCmp("content-pane").removeAll(); // clear old content
-  getLocation(topic, function(lat, lon) {
+  haveActivityGeo(topic, function(lat, lon) {
     var url = "geo/#lat=" + lat + "&lon=" + lon;
     loadContentPage(url, "Go to " + topic.title);
   }, errorCritical);
 }
 
-function getLocation(topic, resultCallback, errorCallback) {
+/**
+ * Gets geo location (lat/long), if available.
+ * And caches it.
+ */
+function haveActivityGeo(topic, resultCallback, errorCallback) {
   if (topic.geo) {
     resultCallback(topic.geo.lat, topic.geo.lon);
     return;
