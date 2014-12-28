@@ -243,10 +243,12 @@ function loadActivityExplore(topic) {
 }
 
 function loadActivityUnderstand(topic) {
-  var page = dbpediaIDForTopic(topic).replace("dbpedia:", "");
-  loadContentPage(
-      "http://en.m.wikipedia.org/wiki/" + encodeURIComponent(page),
-      "Understand " + topic.title);
+  var url = topic.descriptionURL;
+  if ( !url) {
+    var id = dbpediaIDForTopic(topic).replace("dbpedia:", "");
+    url = "http://en.m.wikipedia.org/wiki/" + encodeURIComponent(id);
+  }
+  loadContentPage(url, "Understand " + topic.title);
 }
 
 function loadActivityWatch(topic) {
