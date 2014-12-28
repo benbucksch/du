@@ -194,6 +194,7 @@ function nameForArea(lat, long, zoomLevel, resultCallback, errorCallback) {
       lon : long,
       zoom : zoomLevel,
       addressdetails : 1,
+      "accept-language" : "en",
       format : "json",
     },
     dataType : "json",
