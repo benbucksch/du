@@ -56,7 +56,10 @@ function onLoad() {
       assert(uninav && uninav.Topic, "uninav not found");
       // Find country topic in taxonomy and add this City as new topic
       var addr = loc.address;
-      var tCountry = uninav.findTopicByTitle(addr.country);
+      var tCountry = uninav.findTopicByID("geo" + addr.country);
+      if ( !tCountry) {
+        tCountry = uninav.findTopicByTitle(addr.country);
+      }
       assert(tCountry, "country " + addr.country + " not found");
       var tLowest = tCountry;
       if (addr.state) {
