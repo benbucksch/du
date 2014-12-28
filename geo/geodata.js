@@ -1,3 +1,10 @@
+/**
+ * Loads geographical data, e.g. POIs, address searches etc.
+ * This is pure data, independent from any UI or display.
+ *
+ * (c) 2014 Ben Bucksch
+ * License: MIT
+ */
 
 /**
  * Shows a marker on the map

@@ -1,3 +1,9 @@
+/**
+ * Util functions independent of UI
+ *
+ * (c) 2014 Ben Bucksch
+ * License: MIT
+ */
 
 /**
  * @param test {Boolean}

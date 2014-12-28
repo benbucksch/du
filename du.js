@@ -1,3 +1,15 @@
+/**
+ * Digital Universe main UI
+ *
+ * - Creates the frames/panes for UniNav, Activities and content.
+ * - Implements the Activity panes
+ * - Reacts to topic changes and loads the Activities and content pane content,
+ *   i.e. the highest level wiring / controller.
+ *
+ * (c) 2014 Ben Bucksch
+ * License: GPL3, see LICENSE
+ */
+
 var gSite;
 var gTopic;
 var du = this;

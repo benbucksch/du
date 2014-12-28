@@ -1,6 +1,12 @@
 /**
+ * Loads the map, using one of the implementations in Map2D or Map3D.
+ * This is the controller, wiring things up on a high level.
+ *
  * TODO implement fallback for non-WebGL browsers,
  * using leafletjs, and do not load WebGLEarth in this case.
+ *
+ * (c) 2014 Ben Bucksch
+ * License: GPL3, see LICENSE
  */
 
 var du = window.parent;

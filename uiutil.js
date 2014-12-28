@@ -1,3 +1,9 @@
+/**
+ * Util functions for the UI, or page manipulation
+ *
+ * (c) 2014 Ben Bucksch
+ * License: MIT
+ */
 
 
 function errorCritical(e) {

@@ -12,6 +12,9 @@
  * - module to actually create the chart
  * Only the last module depends on a certain chart JS library.
  * We currently use ChartJS, but that may change at any time.
+ *
+ * (c) 2014 Ben Bucksch
+ * License: GPL3, see LICENSE
  */
 
 function onLoad() {

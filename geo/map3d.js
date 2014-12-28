@@ -1,6 +1,9 @@
 /**
  * Uses webglearth.org to render a map and globe,
  * and allow the user to interact with it.
+ *
+ * (c) 2014 Ben Bucksch
+ * License: GPL3, see LICENSE
  */
 
 function Map3D() {

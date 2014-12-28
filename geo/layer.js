@@ -9,6 +9,9 @@
  * - Colors: Get numeric range (min/max) of values, and map it
  *   to a color range.
  * - Create a layer with polygon features, using this color.
+ *
+ * (c) 2014 Ben Bucksch
+ * License: GPL3, see LICENSE
  */
 
 /**
