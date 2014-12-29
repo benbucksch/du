@@ -41,11 +41,10 @@ function openTopic(topic, changeMode) {
   changeMode = changeMode || 0;
 
   gTopic = topic;
-  Ext.getCmp("content-pane").setTitle(topic.title);
+  E("title").textContent = topic.title;
 
   if (changeMode == 0 || changeMode == 1) {
     // Change content
-    Ext.getCmp("content-pane").removeAll();
     loadActivityDefault(topic);
   }
   if (changeMode == 1 || changeMode == 2) {
@@ -65,140 +64,36 @@ function startupTopic() {
     params.siteWords = "Digital Universe";
   }
   var title = params.siteWords || gSite;
-  openTopic({ // Fake topic
+  return { // Fake topic
     title : title,
     lodID : "dbpedia:" + title.split(" ")[0],
-  });
+  };
 }
+
+function onLoad() {
+  // UI
+  $("activities").accordion();
+  $("body").w2layout({
+    name: "layout",
+    resizer: 3,
+    panels: [
+      { type: "top", size: 200, resizable: true, content: $("#uninav-pane") },
+      { type: "left", size: 200, resizable: true, content: $("#activities-pane") },
+      { type: "main", size: 200, resizable: true, content: $("#content-pane") },
+    ],
+  });
+
+  openTopic(startupTopic(), 0);
+}
+window.addEventListener("DOMContentLoaded", onLoad, false);
+
+
 
 function dbpediaIDForTopic(topic) {
   if ( !topic.lodID) {
     topic.lodID = dbpediaID(topic.title);
   }
   return topic.lodID;
-}
-
-Ext.application({
-    name : "Digital Universe",
-    launch : function() {
-      createUI();
-      startupTopic();
-    },
-});
-
-function createUI() {
-  var uninav = Ext.create('Ext.Component', {
-    id: "uninav",
-    autoEl: {
-        tag: 'iframe',
-        src: "../uninav/uninav.html",
-    }
-  });
-  Ext.create('Ext.container.Container', {
-    renderTo: Ext.getBody(),
-    title: "Digital Universe",
-    width: '100%',
-    height: '100%',
-    layout: 'border',
-    items: [{
-        region: 'west',
-        title: "Activities",
-        id: "activities-pane",
-        xtype: 'panel',
-        slayout: 'accordion',
-        items: [
-        {
-          title: "Inform",
-          id: "activity-inform",
-        },{
-          title: "Understand",
-          id: "activity-understand",
-        },{
-          title: "Locate",
-          id: "activity-geo",
-        },{
-          title: "Explore",
-          id: "activity-explore",
-          disabled : true,
-        },{
-          title: "Learn",
-          id: "activity-learn",
-          disabled : true,
-        },{
-          title: "Watch",
-          id: "activity-watch",
-        },{
-          title: "Listen",
-          id: "activity-listen",
-          disabled : true,
-        },{
-          title: "Play",
-          id: "activity-play",
-          disabled : true,
-        },{
-          title: "Create",
-          id: "activity-create",
-        },{
-          title: "Teach",
-          id: "activity-teach",
-          disabled : true,
-        },{
-          title: "Discuss",
-          id: "activity-discuss",
-          disabled : true,
-        }],
-        width: 200,
-        height: '100%',
-        collapsible: true,
-        split: true,
-    },{
-        region: 'east',
-        title: "Examine",
-        id: "details-pane",
-        xtype: 'panel',
-        layout: 'accordion',
-        items: [],
-        width: 200,
-        height: '100%',
-        hidden: true,
-        collapsible: true,
-        split: true,
-    },{
-        region: 'north',
-        xtype: 'container',
-        title: "UniNav",
-        id: "uninav-pane",
-        height: 200,
-        width: '100%',
-        split: true,
-        items : [uninav],
-        layout: 'fit'
-    },{
-        region: 'center',
-        xtype: 'panel',
-        title: "",
-        id: "content-pane",
-        layout: 'fit'
-    }],
-  });
-  Ext.getCmp("activity-learn").getEl().on("click", function() {
-    loadActivityLearn(gTopic);
-  });
-  Ext.getCmp("activity-inform").getEl().on("click", function() {
-    loadActivityNews(gTopic);
-  });
-  Ext.getCmp("activity-watch").getEl().on("click", function() {
-    loadActivityWatch(gTopic);
-  });
-  Ext.getCmp("activity-understand").getEl().on("click", function() {
-    loadActivityUnderstand(gTopic);
-  });
-  Ext.getCmp("activity-create").getEl().on("click", function() {
-    loadActivityCreate(gTopic);
-  });
-  Ext.getCmp("activity-geo").getEl().on("click", function() {
-    loadActivityGeo(gTopic);
-  });
 }
 
 /**
@@ -222,7 +117,7 @@ function loadActivityDefault(topic) {
 }
 
 function loadActivityLearn(topic) {
-  Ext.getCmp("content-pane").removeAll(); // clear old content
+  clearContentPage();
   var query = "SELECT ?abstract FROM <http://dbpedia.org> WHERE { " +
     esc(dbpediaIDForTopic(topic)) + " dbpedia-owl:abstract ?abstract . " +
     "filter(langMatches(lang(?abstract), '" + getLang() + "')) " + // one lang
@@ -230,7 +125,10 @@ function loadActivityLearn(topic) {
   sparqlSelect1(query, {}, function(result) {
     var abstract = result.abstract;
     assert(abstract, "No abstract found for: " + topic.title);
-    Ext.getCmp("content-pane").update(abstract); // sets content
+    // TODO make a proper page
+    var emptyHTML = "data:text/html;<html><body></body></html>";
+    loadContentPage(emptyHTML, topic.title);
+    E("content").contentDocument.documentElement.textContent = abstract;
   }, errorCritical);
 }
 
@@ -272,7 +170,7 @@ function loadActivityNews(topic) {
 }
 
 function loadActivityGeo(topic) {
-  Ext.getCmp("content-pane").removeAll(); // clear old content
+  clearContentPage();
   haveActivityGeo(topic, function(lat, lon) {
     var url = "geo/#lat=" + lat + "&lon=" + lon;
     loadContentPage(url, "Go to " + topic.title);
@@ -297,41 +195,14 @@ function haveActivityGeo(topic, resultCallback, errorCallback) {
   }, errorCallback);
 }
 
-/**
- * Saves frames, to smoothly transition to new content
- * when a frame of the same content type has been opened before.
- * E.g. when going to Alaska and then going to Canada,
- * do not destroy the frame, but keep it, and fly from
- * Alaska to Canada, instead of just jumping in an instance,
- * or reloading the page.
- *
- * Computationally, this saves JS load and compile time,
- * lib init time, but wastes RAM, by keeping unused frames.
- *
- * Map URL {String} -> frame {Ext.Component}
- */
-gFrames = {};
-
 function loadContentPage(url, title, keepFrame) {
   ddebug("open URL " + url);
-  var baseURL = url.replace(/#.*/, ""); // cut #params
-  var iframe;
-  if (keepFrame && gFrames[baseURL]) {
-    iframe = gFrames[baseURL];
-    iframe.autoEl.src = url;
-  } else {
-    iframe = Ext.create('Ext.Component', {
-      autoEl: {
-          tag: 'iframe',
-          src: url,
-      }
-    });
-    if (keepFrame) {
-      gFrames[baseURL] = iframe;
-    }
-  }
-  var pane = Ext.getCmp("content-pane");
-  pane.setTitle(title);
-  pane.removeAll(); // clear
-  pane.add(iframe);
+  E("title").textContent = title;
+  var iframe = E("content");
+  iframe.src = url;
+}
+
+function clearContentPage() {
+  E("title").textContent = "Loading...";
+  E("content").src = "";
 }
