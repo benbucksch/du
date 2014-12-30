@@ -72,7 +72,9 @@ function startupTopic() {
 
 function onLoad() {
   // UI
-  $("activities").accordion();
+  /*$("#activities").accordion({
+    header: "h2",
+  });*/
   $("body").w2layout({
     name: "layout",
     resizer: 3,
