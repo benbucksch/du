@@ -41,6 +41,12 @@ function openTopic(topic, changeMode) {
   changeMode = changeMode || 0;
 
   gTopic = topic;
+  try {
+    $scope = angular.element(document.querySelector("body")).scope();
+    $scope.$apply(function() {
+      $scope.topic = topic;
+    });
+  } catch (e) { errorCritical(e); }
   E("title").textContent = topic.title;
 
   if (changeMode == 0 || changeMode == 1) {
@@ -90,6 +96,11 @@ function onLoad() {
 window.addEventListener("DOMContentLoaded", onLoad, false);
 
 
+angular.module("duTopic", [])
+  .controller("TopicCtrl", function($scope) {
+    $scope.topic = gTopic;
+  })
+  ;
 
 function dbpediaIDForTopic(topic) {
   if ( !topic.lodID) {
