@@ -75,53 +75,77 @@
 <section id="activities-pane" class="ui-layout-west">
   <h1 class="title">Activities</h1>
   <div id="activities">
-    <h2>Understand</h2>
+    <h2
+      ng-click="loadActivityUnderstand(topic);"
+      >Understand</h2>
     <aside id="activity-understand"
-      ng-click="loadActivityGeo(topic);"
+      ng-click="loadActivityUnderstand(topic);"
       ></aside>
-    <h2>Explore</h2>
-    <aside id="activity-explore"
-      ng-disabled="true"
+    <h2
       ng-click="loadActivityExplore(topic);"
+      ng-show="haveActivityExplore(topic);"
+      >Explore</h2>
+    <aside id="activity-explore"
+      ng-click="loadActivityExplore(topic);"
+      ng-show="haveActivityExplore(topic);"
       ></aside>
-    <h2>Locate</h2>
+    <h2
+      ng-click="loadActivityGeo(topic);"
+      todo-ng-show="haveActivityGeo(topic)"
+      >Locate</h2>
     <aside id="activity-geo"
       ng-click="loadActivityGeo(topic);"
-      disabled="true"
+      todo-ng-show="haveActivityGeo(topic)"
       ></aside>
-    <h2>Learn</h2>
+    <h2
+      ng-click="loadActivityLearn(topic);"
+      >Learn</h2>
     <aside id="activity-learn"
       ng-click="loadActivityLearn(topic);"
       disabled="true"
       ></aside>
-    <h2>News</h2>
+    <h2
+      ng-click="loadActivityNews(topic);"
+      >News</h2>
     <aside id="activity-news"
       ng-click="loadActivityNews(topic);"
       ></aside>
-    <h2>Discuss</h2>
+    <h2
+      disabled="true"
+      >Discuss</h2>
     <aside id="activity-discuss"
       disabled="true"
       ></aside>
-    <h2>See</h2>
+    <h2
+      ng-click="loadActivitySee(topic);"
+      >See</h2>
     <aside id="activity-see"
       ng-click="loadActivitySee(topic);"
       ></aside>
-    <h2>Watch</h2>
+    <h2
+      disabled="true"
+      >Watch</h2>
     <aside id="activity-watch"
       ng-click="loadActivityWatch(topic);"
       ></aside>
-    <h2>Play</h2>
+    <h2
+      disabled="true"
+      >Play</h2>
     <aside id="activity-play"
       disabled="true"
       ></aside>
-    <h2>Create</h2>
+    <h2
+      disabled="true"
+      >Create</h2>
     <aside id="activity-create"
       disabled="true"
       ></aside>
-    <h2>Credits</h2>
+    <h2
+      ng-click="loadActivityCredits(topic);"
+      >Credits</h2>
     <aside id="activity-credits"
-      ng-click="loadActivityWatch(topic);"
-      disabled="true"
+      ng-click="loadActivityCredits(topic);"
+      ng-show="loadActivityCredits(topic)"
       ></aside>
   </div>
 </section>
