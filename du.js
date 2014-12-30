@@ -49,10 +49,13 @@ function openTopic(topic, changeMode) {
   } catch (e) { errorCritical(e); }
   E("title").textContent = topic.title;
 
-  if (changeMode == 0 || changeMode == 1) {
-    // Change content
-    loadActivityDefault(topic);
-  }
+  gActivities.setTopic(topic, function() {
+    if (changeMode == 0 || changeMode == 1) {
+      // Change content
+      gActivities.startMain();
+    }
+  }, errorCritical);
+
   if (changeMode == 1 || changeMode == 2) {
     // Change UniNav
     //var uninav = E("uninav").contentWindow;
@@ -99,114 +102,277 @@ window.addEventListener("DOMContentLoaded", onLoad, false);
 angular.module("duTopic", [])
   .controller("TopicCtrl", function($scope) {
     $scope.topic = gTopic;
+    $scope.activity = gActivities.activities;
   })
   ;
 
-function dbpediaIDForTopic(topic) {
-  if ( !topic.lodID) {
-    topic.lodID = dbpediaID(topic.title);
-  }
-  return topic.lodID;
+
+
+function Activity() {
+}
+Activity.prototype = {
+  /**
+   * {Topic} from UniNav
+   */
+  topic : null,
+  enabled : true,
+
+  setTopic : function(topic, successCallback, errorCallback) {
+    assert(typeof(topic) == "object", "Need topic");
+    this.topic = topic;
+    var self = this;
+    this.getEnabled(function(enabled) {
+      if (enabled) {
+        self.getPanelContent(successCallback, errorCallback);
+      } else {
+        successCallback();
+      }
+    }, errorCallback);
+  },
+  /**
+   * Checks whether this activity is available for |topic|.
+   * This may be an async call.
+   *
+   * @param resultCallback {Function(boolean enabled)}
+   */
+  getEnabled : function(resultCallback, errorCallback) {
+    resultCallback(this.enabled);
+  },
+  /**
+   * Gets and displays the content of the panel in the sidebar.
+   * @param successCallback {Function()} content fetched
+   *    and properties of this object filled
+   */
+  getPanelContent : function(successCallback, errorCallback) {
+    successCallback();
+  },
+  /**
+   * Loads this activity in the main content pane.
+   */
+  startMain : function() {
+    throw new NotReached("abstract interface");
+  },
 }
 
 /**
- * Decides which activity to load for a given topic
- *
- * Try, in order:
- * - Explore (animation)
- * - Geo (Map)
- * - Unterstand (Wikipedia)
+ * Manages all activities
  */
-function loadActivityDefault(topic) {
-  if (haveActivityExplore(topic)) {
-    loadActivityExplore(topic);
-  } else {
-    haveActivityGeo(topic, function() {
-      loadActivityGeo(topic);
-    }, function(e) { // no geo location found
-      loadActivityUnderstand(topic);
+function AllActivity() {
+  this.activities = {
+    understand : new UnderstandActivity(),
+    explore : new ExploreActivity(),
+    geo : new GeoActivity(),
+    news : new NewsActivity(),
+    see : new DisabledActivity(),
+    watch : new WatchActivity(),
+    play : new DisabledActivity(),
+    create : new CreateActivity(),
+    credits : new DisabledActivity(),
+  };
+}
+AllActivity.prototype = {
+  enabled : true,
+  setTopic : function(topic, successCallback, errorCallback) {
+    var waiting = 0;
+    var done = function() {
+      if (--waiting == 0) {
+        successCallback();
+      }
+    };
+    for (var name in this.activities) {
+      var activity = this.activities[name];
+      waiting++;
+      activity.setTopic(topic, done, done);
+    }
+  },
+  /**
+   * Decides which activity to load for a given topic
+   *
+   * Try, in order:
+   * - Explore (animation)
+   * - Geo (Map)
+   * - Unterstand (Wikipedia)
+   */
+  startMain : function() {
+    var a = this.activities;
+    if (a.explore.enabled) {
+      a.explore.startMain();
+    } else if (a.geo.enabled) {
+      a.geo.startMain();
+    } else {
+      a.understand.startMain();
+    }
+  },
+}
+extend(AllActivity, Activity);
+
+function DisabledActivity() {
+}
+DisabledActivity.prototype = {
+  enabled : false,
+
+  setTopic : function(topic, successCallback, errorCallback) {
+    assert(typeof(topic) == "object", "Need topic");
+    this.topic = topic;
+    successCallback();
+  },
+  getEnabled : function(resultCallback, errorCallback) {
+    resultCallback(false);
+  },
+  getPanelContent : function(successCallback, errorCallback) {
+    successCallback();
+  },
+  startMain : function() {
+  },
+}
+extend(DisabledActivity, Activity);
+
+
+
+function UnderstandActivity() {
+}
+UnderstandActivity.prototype = {
+  getEnabled : function(resultCallback, errorCallback) {
+    resultCallback(true);
+  },
+  getPanelContent : function(successCallback, errorCallback) {
+    var self = this;
+    var query = "SELECT ?abstract FROM <http://dbpedia.org> WHERE { " +
+      esc(dbpediaIDForTopic(this.topic)) + " dbpedia-owl:abstract ?abstract . " +
+      "filter(langMatches(lang(?abstract), '" + getLang() + "')) " + // one lang
+    "}";
+    sparqlSelect1(query, {}, function(result) {
+      self.abstract = result.abstract;
+      assert(self.abstract, "No abstract found for: " + self.topic.title);
+      self.abstract = self.abstract.substr(0, 200);
+      self.abstract += "… (More…)";
+      resultCallback();
+    }, errorCallback);
+  },
+  startMain : function() {
+    var url = this.topic.descriptionURL;
+    if ( !url) {
+      var id = dbpediaIDForTopic(this.topic).replace("dbpedia:", "");
+      url = "http://en.m.wikipedia.org/wiki/" + encodeURIComponent(id);
+    }
+    loadContentPage(url, "Understand " + this.topic.title);
+  },
+}
+extend(UnderstandActivity, Activity);
+
+
+function GeoActivity() {
+}
+GeoActivity.prototype = {
+  enabled : false,
+  /**
+   * Gets geo location (lat/long), if available.
+   * And caches it.
+   */
+  getEnabled : function(resultCallback, errorCallback) {
+    if (this.topic.geo) {
+      this.geo = this.topic.geo;
+      this.enabled = true;
+      resultCallback(this.enabled);
+      return;
+    } else if (this.topic.noGeo) {
+      this.enabled = false;
+      resultCallback(this.enabled);
+      return;
+    }
+    var self = this;
+    var query = "SELECT * FROM <http://dbpedia.org> WHERE {" +
+      esc(dbpediaIDForTopic(this.topic)) + " geo:lat ?lat ; " +
+      " geo:long ?lon . " +
+    "}";
+    sparqlSelect1(query, {}, function(result) {
+      self.geo = self.topic.geo = {
+        lat : parseFloat(result.lat),
+        lon : parseFloat(result.lon),
+      };
+      self.enabled = true;
+      resultCallback(true);
+    }, function(e) {
+      self.enabled = false;
+      if (e instanceof NoResult) {
+        self.topic.noGeo = true;
+        resultCallback(self.enabled);
+      } else {
+        errorCallback(e);
+      }
     });
-  }
+  },
+  getPanelContent : function(successCallback, errorCallback) {
+    successCallback();
+  },
+  startMain : function() {
+    assert(this.enabled);
+    var geo = this.topic.geo;
+    var url = "geo/#lat=" + geo.lat + "&lon=" + geo.lon;
+    loadContentPage(url, "Go to " + this.topic.title);
+  },
 }
+extend(GeoActivity, Activity);
 
-function loadActivityLearn(topic) {
-  clearContentPage();
-  var query = "SELECT ?abstract FROM <http://dbpedia.org> WHERE { " +
-    esc(dbpediaIDForTopic(topic)) + " dbpedia-owl:abstract ?abstract . " +
-    "filter(langMatches(lang(?abstract), '" + getLang() + "')) " + // one lang
-  "}";
-  sparqlSelect1(query, {}, function(result) {
-    var abstract = result.abstract;
-    assert(abstract, "No abstract found for: " + topic.title);
-    // TODO make a proper page
-    var emptyHTML = "data:text/html;<html><body></body></html>";
-    loadContentPage(emptyHTML, topic.title);
-    E("content").contentDocument.documentElement.textContent = abstract;
-  }, errorCritical);
-}
 
-function haveActivityExplore(topic) {
-  return !!topic.exploreURL;
+function ExploreActivity() {
 }
+ExploreActivity.prototype = {
+  enabled : false,
+  getEnabled : function(resultCallback, errorCallback) {
+    this.enabled = !!this.topic.exploreURL
+    resultCallback(this.enabled);
+  },
+  getPanelContent : function(successCallback, errorCallback) {
+    successCallback();
+  },
+  startMain : function() {
+    assert(this.enabled);
+    loadContentPage(this.topic.exploreURL, "Explore " + this.topic.title);
+  },
+}
+extend(ExploreActivity, Activity);
 
-function loadActivityExplore(topic) {
-  loadContentPage(topic.exploreURL, "Explore " + topic.title);
-}
 
-function loadActivityUnderstand(topic) {
-  var url = topic.descriptionURL;
-  if ( !url) {
-    var id = dbpediaIDForTopic(topic).replace("dbpedia:", "");
-    url = "http://en.m.wikipedia.org/wiki/" + encodeURIComponent(id);
-  }
-  loadContentPage(url, "Understand " + topic.title);
+function WatchActivity() {
 }
+WatchActivity.prototype = {
+  startMain : function() {
+    assert(this.enabled);
+    loadContentPage(
+        // "https://www.youtube.com/results?search_query=" + youtube forbids framing
+        "https://video.search.yahoo.com/search/?p=" +
+        encodeURIComponent(this.topic.title),
+        "Watch " + this.topic.title + " movies");
+  },
+}
+extend(WatchActivity, Activity);
 
-function loadActivityWatch(topic) {
-  loadContentPage(
-      // "https://www.youtube.com/results?search_query=" + youtube forbids framing
-      "https://video.search.yahoo.com/search/?p=" +
-      encodeURIComponent(topic.title),
-      "Watch " + topic.title + " movies");
+function CreateActivity() {
 }
+CreateActivity.prototype = {
+  startMain : function() {
+    var domain = this.topic.title.replace(/[ \&\,]*/g, "").toLowerCase() + "expert.org";
+    var url = "http://www.securepaynet.net/domains/search.aspx?prog_id=473220&domainToCheck=" + domain + "&tld=.org&checkAvail=1";
+    loadContentPage(url, "Create the " + this.topic.title + " portal");
+  },
+}
+extend(CreateActivity, Activity);
 
-function loadActivityCreate(topic) {
-  var domain = topic.title.replace(/[ \&\,]*/g, "").toLowerCase() + "expert.org";
-  var url = "http://www.securepaynet.net/domains/search.aspx?prog_id=473220&domainToCheck=" + domain + "&tld=.org&checkAvail=1";
-  loadContentPage(url, "Create the " + topic.title + " portal");
+function NewsActivity() {
 }
+NewsActivity.prototype = {
+  startMain : function() {
+    loadContentPage(
+        "http://" + gSite + "/activity-news.php",
+        "News");
+  },
+}
+extend(NewsActivity, Activity);
 
-function loadActivityNews(topic) {
-  loadContentPage(
-      "http://" + gSite + "/activity-news.php",
-      "News");
-}
+var gActivities = new AllActivity();
 
-function loadActivityGeo(topic) {
-  clearContentPage();
-  haveActivityGeo(topic, function(lat, lon) {
-    var url = "geo/#lat=" + lat + "&lon=" + lon;
-    loadContentPage(url, "Go to " + topic.title);
-  }, errorCritical);
-}
 
-/**
- * Gets geo location (lat/long), if available.
- * And caches it.
- */
-function haveActivityGeo(topic, resultCallback, errorCallback) {
-  if (topic.geo) {
-    resultCallback(topic.geo.lat, topic.geo.lon);
-    return;
-  }
-  var query = "SELECT * FROM <http://dbpedia.org> WHERE {" +
-    esc(dbpediaIDForTopic(topic)) + " geo:lat ?lat ; " +
-    " geo:long ?lon . " +
-  "}";
-  sparqlSelect1(query, {}, function(result) {
-    resultCallback(parseFloat(result.lat), parseFloat(result.lon));
-  }, errorCallback);
-}
 
 function loadContentPage(url, title, keepFrame) {
   ddebug("open URL " + url);
@@ -218,4 +384,12 @@ function loadContentPage(url, title, keepFrame) {
 function clearContentPage() {
   E("title").textContent = "Loading...";
   E("content").src = "";
+}
+
+
+function dbpediaIDForTopic(topic) {
+  if ( !topic.lodID) {
+    topic.lodID = dbpediaID(topic.title);
+  }
+  return topic.lodID;
 }
