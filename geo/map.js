@@ -10,7 +10,8 @@
  */
 
 var du = window.parent;
-var gMap;
+var gMap; // {Map2D or Map3D}
+var gAppTitle; // {String}
 
 function onLoad() {
   E("search-button").addEventListener("click", onSearch, false);
@@ -22,35 +23,53 @@ function onLoad() {
 
   var map = gMap = new Map2D();
 
-  var params = parseURLQueryString(window.location.hash);
-  var lat = params.lat || 51.330;
-  var long = params.lon || 10.453;
-  map.setPos(lat, long);
-  if (params.address) {
-    E("search-field").value = params.address;
-    onSearch();
-  } else if (params.statsFor) {
-    showStats(params.statsFor, function(areas) {
-      map.showPOIs(areas, {
-        onClick : function(feature) {
-          var topic = du.uninav.findTopicByTitle(feature.name);
-          assert(topic, feature.name + " not found in DU taxonomy");
-          du.openTopic(topic, 2);
-        },
-        errorCallback : errorCritical,
-        zoom : false,
-      });
-    }, errorCritical);
-  }
+  parseURL();
+  window.addEventListener("hashchange", parseURL, false);
 
-  var appTitle = document.title;
-  map.onMove(function(latCenter, longCenter, zoomLevel,
+  gAppTitle = document.title;
+  map.onMove(onMove);
+}
+window.addEventListener("load", onLoad, false);
+
+/**
+ * Called when URL #... changes.
+ * Changes the focus.
+ */
+function parseURL() {
+  try {
+    var map = gMap;
+    var params = parseURLQueryString(window.location.hash);
+    var lat = params.lat || 51.330;
+    var long = params.lon || 10.453;
+    map.setPos(lat, long);
+    if (params.address) {
+      E("search-field").value = params.address;
+      onSearch();
+    } else if (params.statsFor) {
+      showStats(params.statsFor, function(areas) {
+        map.showPOIs(areas, {
+          onClick : function(feature) {
+            var topic = du.uninav.findTopicByTitle(feature.name);
+            assert(topic, feature.name + " not found in DU taxonomy");
+            du.openTopic(topic, 2);
+          },
+          errorCallback : errorCritical,
+          zoom : false,
+        });
+      }, errorCritical);
+    }
+  } catch (e) { errorCritical(e); }
+}
+
+function onMove(latCenter, longCenter, zoomLevel,
       latNorth, longWest, latSouth, longEast) {
+  try {
+    var map = gMap;
     ddebug("Location " + latCenter + ", " + longCenter + ", zoom " + zoomLevel);
     zoomLevel -= 5; // apparently leaflet and Nominatim zoom levels don't match
     nameForArea(latCenter, longCenter, zoomLevel + 3, function(loc) {
       ddebug("Moved to " + dumpObject(loc, "loc", 3));
-      document.title = loc.name + " - " + appTitle;
+      document.title = loc.name + " - " + gAppTitle;
 
       var uninav = du.uninav;
       assert(uninav && uninav.Topic, "uninav not found");
@@ -89,9 +108,9 @@ function onLoad() {
 
       du.openTopic(tLowest, 2);
     }, errorNonCritical);
-  });
+  } catch (e) { errorNonCritical(e); }
 }
-window.addEventListener("load", onLoad, false);
+
 
 function onSearch(event) {
   var errorCallback = function(e) {
