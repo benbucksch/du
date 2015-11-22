@@ -11,7 +11,8 @@
  */
 
 var gSite;
-var gTopic;
+var gActivities;
+var gScope;
 var du = this;
 var uninav; // set by uninav.js
 
@@ -38,29 +39,31 @@ var uninav; // set by uninav.js
  *     stays as-is.
  */
 function openTopic(topic, changeMode) {
-  changeMode = changeMode || 0;
+  gScope.$apply(function() {
+    try {
+      changeMode = changeMode || 0;
 
-  gTopic = topic;
-  try {
-    $scope = angular.element(document.querySelector("body")).scope();
-    $scope.$apply(function() {
-      $scope.topic = topic;
-    });
-  } catch (e) { errorCritical(e); }
-  E("title").textContent = topic.title;
+      gScope.topic = topic;
+      E("title").textContent = topic.title;
 
-  gActivities.setTopic(topic, function() {
-    if (changeMode == 0 || changeMode == 1) {
-      // Change content
-      gActivities.startMain();
-    }
-  }, errorCritical);
+      gActivities.setTopic(topic, function() {
+        if (changeMode == 0 || changeMode == 1) {
+          // Change content
+          gActivities.startMain();
+        }
+        gScope.$apply();
+      }, function(e) {
+        errorCritical(e);
+        gScope.$apply();
+      });
 
-  if (changeMode == 1 || changeMode == 2) {
-    // Change UniNav
-    //var uninav = E("uninav").contentWindow;
-    uninav.showTopic(topic);
-  }
+      if (changeMode == 1 || changeMode == 2) {
+        // Change UniNav
+        //var uninav = E("uninav").contentWindow;
+        uninav.showTopic(topic);
+      }
+    } catch (e) { errorCritical(e); }
+  });
 }
 
 /**
@@ -93,22 +96,31 @@ function onLoad() {
       { type: "main", size: 200, resizable: true, content: $("#content-pane") },
     ],
   });
-
-  openTopic(startupTopic(), 0);
 }
 window.addEventListener("DOMContentLoaded", onLoad, false);
 
 
-angular.module("duTopic", [])
+var app = angular.module("duTopic", [])
   .controller("TopicCtrl", function($scope) {
-    $scope.topic = gTopic;
-    $scope.activities = gActivities.activities;
+    ddebug("controller startup");
+    gScope = $scope;
+    gActivities = new AllActivity();
+    gScope.activities = gActivities.activities;
+
+    setTimeout(function() { // https://docs.angularjs.org/error/$rootScope/inprog?p0=$apply
+      openTopic(startupTopic());
+    }, 0);
   })
   ;
+
+app.run(function($rootScope) {
+  ddebug("startup");
+});
 
 
 
 function Activity() {
+  this.$scope = gScope;
 }
 Activity.prototype = {
   /**
@@ -127,7 +139,10 @@ Activity.prototype = {
       } else {
         successCallback();
       }
-    }, errorCallback);
+    }, function(e) {
+      self.enabled = false;
+      errorCallback(e);
+    });
   },
   /**
    * Checks whether this activity is available for |topic|.
@@ -158,6 +173,7 @@ Activity.prototype = {
  * Manages all activities
  */
 function AllActivity() {
+  Activity.call(this);
   this.activities = {
     understand : new UnderstandActivity(),
     explore : new ExploreActivity(),
@@ -207,6 +223,7 @@ AllActivity.prototype = {
 extend(AllActivity, Activity);
 
 function DisabledActivity() {
+  Activity.call(this);
 }
 DisabledActivity.prototype = {
   enabled : false,
@@ -230,6 +247,7 @@ extend(DisabledActivity, Activity);
 
 
 function UnderstandActivity() {
+  Activity.call(this);
 }
 UnderstandActivity.prototype = {
   getEnabled : function(resultCallback, errorCallback) {
@@ -266,6 +284,7 @@ extend(UnderstandActivity, Activity);
 
 
 function GeoActivity() {
+  Activity.call(this);
 }
 GeoActivity.prototype = {
   enabled : false,
@@ -321,6 +340,7 @@ extend(GeoActivity, Activity);
 
 
 function ExploreActivity() {
+  Activity.call(this);
 }
 ExploreActivity.prototype = {
   enabled : false,
@@ -340,6 +360,7 @@ extend(ExploreActivity, Activity);
 
 
 function WatchActivity() {
+  Activity.call(this);
 }
 WatchActivity.prototype = {
   startMain : function() {
@@ -354,6 +375,7 @@ WatchActivity.prototype = {
 extend(WatchActivity, Activity);
 
 function CreateActivity() {
+  Activity.call(this);
 }
 CreateActivity.prototype = {
   startMain : function() {
@@ -365,6 +387,7 @@ CreateActivity.prototype = {
 extend(CreateActivity, Activity);
 
 function NewsActivity() {
+  Activity.call(this);
 }
 NewsActivity.prototype = {
   startMain : function() {
@@ -374,9 +397,6 @@ NewsActivity.prototype = {
   },
 }
 extend(NewsActivity, Activity);
-
-var gActivities = new AllActivity();
-
 
 
 function loadContentPage(url, title, keepFrame) {
