@@ -72,10 +72,16 @@ function openTopic(topic, changeMode) {
 function startupTopic() {
   var params = parseURLQueryString(window.location.search);
   gSite = params.site || window.location.hostname;
-  if (gSite.indexOf("labrasol") != -1) {
-    params.siteWords = "Labrasol"; // TODO default page
-  }
   var title = params.siteWords || gSite;
+  var labrasolPos = gSite.indexOf(".labrasol.");
+  if (labrasolPos != -1) {
+    var word = gSite.substr(0, labrasolPos);
+    if (word && word != "www") {
+      title = capitalize(word);
+    } else {
+      title = "Labrasol"; // TODO default page
+    }
+  }
   return { // Fake topic
     title : title,
     lodID : "dbpedia:" + title.split(" ")[0],
@@ -417,4 +423,8 @@ function dbpediaIDForTopic(topic) {
     topic.lodID = dbpediaID(topic.title);
   }
   return topic.lodID;
+}
+
+function capitalize(word) {
+  return word[0].toUpperCase() + word.substr(1).toLowerCase();
 }
