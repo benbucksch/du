@@ -102,7 +102,7 @@ window.addEventListener("DOMContentLoaded", onLoad, false);
 angular.module("duTopic", [])
   .controller("TopicCtrl", function($scope) {
     $scope.topic = gTopic;
-    $scope.activity = gActivities.activities;
+    $scope.activities = gActivities.activities;
   })
   ;
 
@@ -242,11 +242,15 @@ UnderstandActivity.prototype = {
       "filter(langMatches(lang(?abstract), '" + getLang() + "')) " + // one lang
     "}";
     sparqlSelect1(query, {}, function(result) {
-      self.abstract = result.abstract;
-      assert(self.abstract, "No abstract found for: " + self.topic.title);
-      self.abstract = self.abstract.substr(0, 200);
-      self.abstract += "… (More…)";
-      resultCallback();
+      var abstract = result.abstract;
+      ddebug("Got abstract " + abstract);
+      assert(abstract && abstract.length, "No abstract found for: " + self.topic.title);
+      if (abstract.length > 200) {
+        abstract = abstract.substr(0, 200);
+        abstract += "… (More…)";
+      }
+      self.topic.abstract = abstract;
+      successCallback();
     }, errorCallback);
   },
   startMain : function() {
@@ -306,6 +310,7 @@ GeoActivity.prototype = {
     successCallback();
   },
   startMain : function() {
+    ddebug("loading map for " + this.topic.title);
     assert(this.enabled);
     var geo = this.topic.geo;
     var url = "geo/#lat=" + geo.lat + "&lon=" + geo.lon;
