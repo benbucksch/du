@@ -1,7 +1,7 @@
 <!doctype html>
 <html ng-app="duTopic">
 <head>
-<title>Digital Universe</title>
+<title>Labrasol</title>
 <meta charset="utf-8"></meta>
 <style>
   /**
@@ -9,7 +9,7 @@
   * License: GPL3, see LICENSE
   */
   @import url("img/style.css");
-  html, body, #uninav-pane {
+  html, body, #topicnav-pane {
     width: 100%;
     height: 100%;
     padding: 0 0 0 0;
@@ -68,8 +68,8 @@
 </head>
 <body ng-controller="TopicCtrl">
 
-<nav id="uninav-pane" class="ui-layout-north">
-  <iframe id="uninav" src="../uninav/uninav.html"></iframe>
+<nav id="topicnav-pane" class="ui-layout-north">
+  <iframe id="topicnav" src="../uninav/uninav.html"></iframe>
 </nav>
 
 <section id="activities-pane" class="ui-layout-west">
@@ -151,7 +151,7 @@
 </section>
 
 <section id="content-pane" class="ui-layout-center">
-  <h1 id="title" class="title">Digital Universe</h1>
+  <h1 id="title" class="title">Labrasol</h1>
   <iframe id="content"></iframe>
 </section>
 

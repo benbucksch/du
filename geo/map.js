@@ -5,7 +5,7 @@
  * TODO implement fallback for non-WebGL browsers,
  * using leafletjs, and do not load WebGLEarth in this case.
  *
- * (c) 2014 Ben Bucksch
+ * (c) 2014-2015 Ben Bucksch
  * License: GPL3, see LICENSE
  */
 
@@ -50,7 +50,7 @@ function parseURL() {
         map.showPOIs(areas, {
           onClick : function(feature) {
             var topic = du.uninav.findTopicByTitle(feature.name);
-            assert(topic, feature.name + " not found in DU taxonomy");
+            assert(topic, feature.name + " not found in taxonomy");
             du.openTopic(topic, 2);
           },
           errorCallback : errorCritical,
@@ -88,7 +88,7 @@ function onMove(latCenter, longCenter, zoomLevel,
           tState = new uninav.Topic();
           tState.title = addr.state;
           tState.id = stateID;
-          tState.img = "manyone.png";
+          tState.img = "placeholder.png";
           tState.addToParent(tCountry);
         }
         tLowest = tState;
@@ -100,7 +100,7 @@ function onMove(latCenter, longCenter, zoomLevel,
           var tCity = new uninav.Topic();
           tCity.title = addr.city;
           tCity.id = cityID;
-          tCity.img = "manyone.png";
+          tCity.img = "placeholder.png";
           tCity.addToParent(tLowest);
         }
         tLowest = tCity;

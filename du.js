@@ -1,12 +1,12 @@
 /**
- * Digital Universe main UI
+ * Labrasol main UI
  *
- * - Creates the frames/panes for UniNav, Activities and content.
+ * - Creates the frames/panes for TopicNav, Activities and content.
  * - Implements the Activity panes
  * - Reacts to topic changes and loads the Activities and content pane content,
  *   i.e. the highest level wiring / controller.
  *
- * (c) 2014 Ben Bucksch
+ * (c) 2014-2015 Ben Bucksch
  * License: GPL3, see LICENSE
  */
 
@@ -17,23 +17,23 @@ var du = this;
 var uninav; // set by uninav.js
 
 /**
- * Change to go to another DU topic.
+ * Change to go to another topic.
  *
  * This doesn't entirely reload the current page,
  * just changes the content. Called SPA "Single Page Architecture".
  *
- * Currently called directly from uninav iframe.
+ * Currently called directly from TopicNav iframe.
  * This direction function call works, because it's the same domain.
  * Alternative: events sent via postMessage(), see below.
  * @param topic {Topic}
  * @param changeMode {Integer-Enum}
- *     if 0, it comes from UniNav and we change activities and content
+ *     if 0, it comes from TopicNav and we change activities and content
  *     if 1, the change comes from content (animation, geo etc.),
  *     and a complete change is wanted, similar to a normal link click.
  *     The content and activity *shall* be changed,
  *     if 2, the change comes from content (animation, geo etc.).
  *     The content shall *not* be changed, i,e. no default activity loaded,
- *     but the topic in UniNav changes and the activity bar content changes.
+ *     but the topic in TopicNav changes and the activity bar content changes.
  *     I.e. this is a "seamless" topic change, where only the
  *     information in the side frames changes, but the content
  *     stays as-is.
@@ -58,8 +58,8 @@ function openTopic(topic, changeMode) {
       });
 
       if (changeMode == 1 || changeMode == 2) {
-        // Change UniNav
-        //var uninav = E("uninav").contentWindow;
+        // Change TopicNav
+        //var uninav = E("topicnav").contentWindow;
         uninav.showTopic(topic);
       }
     } catch (e) { errorCritical(e); }
@@ -72,8 +72,8 @@ function openTopic(topic, changeMode) {
 function startupTopic() {
   var params = parseURLQueryString(window.location.search);
   gSite = params.site || window.location.hostname;
-  if (gSite == "www.manyone.zone" || gSite == "manyone.zone") {
-    params.siteWords = "Digital Universe";
+  if (gSite.indexOf("labrasol") != -1) {
+    params.siteWords = "Labrasol"; // TODO default page
   }
   var title = params.siteWords || gSite;
   return { // Fake topic
@@ -91,7 +91,7 @@ function onLoad() {
     name: "layout",
     resizer: 3,
     panels: [
-      { type: "top", size: 200, resizable: true, content: $("#uninav-pane") },
+      { type: "top", size: 200, resizable: true, content: $("#topicnav-pane") },
       { type: "left", size: 200, resizable: true, content: $("#activities-pane") },
       { type: "main", size: 200, resizable: true, content: $("#content-pane") },
     ],
@@ -124,7 +124,7 @@ function Activity() {
 }
 Activity.prototype = {
   /**
-   * {Topic} from UniNav
+   * {Topic} from TopicNav
    */
   topic : null,
   enabled : true,

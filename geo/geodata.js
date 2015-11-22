@@ -2,7 +2,7 @@
  * Loads geographical data, e.g. POIs, address searches etc.
  * This is pure data, independent from any UI or display.
  *
- * (c) 2014 Ben Bucksch
+ * (c) 2014-2015 Ben Bucksch
  * License: MIT
  */
 
@@ -149,7 +149,7 @@ function parseOSMXML(xmlDOM) {
  */
 function searchAddress(address, resultCallback, errorCallback) {
   loadURL({
-    url : "http://www.manyone.zone/geo/address",
+    url : "http://www.labrasol.com/geo/address",
     urlArgs : {
       q : address,
       format : "json",
@@ -188,7 +188,7 @@ function searchAddress(address, resultCallback, errorCallback) {
  */
 function nameForArea(lat, long, zoomLevel, resultCallback, errorCallback) {
   loadURL({
-    url : "http://www.manyone.zone/geo/reverse",
+    url : "http://www.labrasol.com/geo/reverse",
     urlArgs : {
       lat : lat,
       lon : long,
@@ -244,7 +244,7 @@ function enhancePOIs(pois, resultCallback, errorCallback) {
 
 /**
  * For the POI, tries to find:
- * - DU topic
+ * - topic
  * - dbpedia entry
  * - class
  * @param poi {POI}  modified in-place

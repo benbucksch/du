@@ -45,7 +45,7 @@ function onLoadData() {
   var graphs = {
     "http://dbpedia.org": "dbpedia / Wikipedia infoboxes",
     "http://linkedgeodata.org": "OpenStreetMap POIs",
-    "http://manyone.org/du/": "ManyOne Steward/science data",
+    "http://labrasol.com/du/": "Steward/science data",
   };
   new Dropdown(E("source-graph")).addOptions(graphs);
 }
