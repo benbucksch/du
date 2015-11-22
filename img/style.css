@@ -1,53 +1,55 @@
 /* Icons for activities */
 
-#activities-pane-body .x-title-text {
-  font-size: 16px;
-}
-#activities-pane-body .x-panel-header {
+#activities h2 {
   background-position: left top;
   background-repeat: no-repeat;
-  padding-left: 54px;
+  padding: 2px 10px 2px 54px;
   background-color: #E0E0E0;
   border-width: 1px !important;
   border-image-width: 0px;
 }
-#activities-pane-body .x-panel-body {
+#activities {
   border-width: 0px;
 }
-#activities-pane-body .x-mask {
+/*
+#activities {
   background-color: #E0E0E0;
 }
+#activities {
+  font-size: 16px;
+}
+*/
 
-#activity-inform .x-panel-header {
+#activity-news h2 {
   background-image: url("newspaper.png");
 }
-#activity-understand .x-panel-header {
+#activity-understand h2 {
   background-image: url("books.png");
 }
-#activity-geo .x-panel-header {
+#activity-geo h2 {
   background-image: url("earth.png");
 }
-#activity-explore .x-panel-header {
+#activity-explore h2 {
   background-image: url("gears.png");
 }
-#activity-learn .x-panel-header {
+#activity-learn h2 {
   background-image: url("einstein.png");
 }
-#activity-watch .x-panel-header {
+#activity-watch h2 {
   background-image: url("beach.png");
 }
-#activity-listen .x-panel-header {
+#activity-listen h2 {
   background-image: url("music.png");
 }
-#activity-play .x-panel-header {
+#activity-play h2 {
   background-image: url("runner.png");
 }
-#activity-create .x-panel-header {
+#activity-create h2 {
   background-image: url("create.png");
 }
-#activity-teach .x-panel-header {
+#activity-teach h2 {
   background-image: url("school.png");
 }
-#activity-discuss .x-panel-header {
+#activity-discuss h2 {
   background-image: url("postbox.png");
 }
