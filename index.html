@@ -42,6 +42,12 @@
     font-size: 10pt;
     font-weight: normal;
   }
+  #activities-pane .title {
+    padding-left: 54px;
+  }
+  #activities-header {
+    padding-left: 10px !important;
+  }
   #activities h2 {
     font-size: 11pt;
     font-weight: 600;
@@ -51,6 +57,18 @@
   }
   #activities aside > div {
     padding: 4px 8px;
+  }
+
+  #topic-header img.icon {
+    width: 48px;
+    height: 48px;
+    position: absolute;
+    left: 0; top: 0;
+  }
+  #topic-header > .title {
+    min-height: 48px;
+    font-size: 12pt;
+    font-weight: bold;
   }
 
   .w2ui-resizer {
@@ -78,7 +96,12 @@
 </nav>
 
 <section id="activities-pane" class="ui-layout-west">
-  <h1 class="title">Activities</h1>
+  <div id="topic-header"
+     hg-show="topic && topic.title">
+    <img class="icon" src="{{ topic.iconURL }}"></img>
+    <h1 class="title">{{ topic.title }}</h1>
+  </div>
+  <h1 id="activities-header" class="title">Activities</h1>
   <div id="activities">
     <div id="activity-understand"
       ng-click="activities.understand.startMain();"
