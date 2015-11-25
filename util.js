@@ -521,10 +521,14 @@ extend(NoResult, Exception);
  * Allows to call many async functions,
  * and wait for them *all* to complete.
         var w = new Waiter(successCallback, errorCallback);
-        for (var lang in allLangStorages) {
-          var storage = allLangStorages[lang];
+        for (var lang in allLanguages) {
           lodTitles(storage, lang, w.success(), w.error());
           lodDescrs(storage, lang, w.success(), w.error());
+          var infoSuccess = w.success();
+          lodInfo(storage, lang, function() {
+            // Do NOT call w.success() here directly. It's too late.
+            infoSuccess();
+          }, w.error());
         }
  */
 function Waiter(successCallback, errorCallback) {

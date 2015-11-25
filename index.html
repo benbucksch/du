@@ -80,7 +80,8 @@
   #activity-understand .webpages {
     margin-left: 5px;
     margin-top: 5px;
-    overflow-y: scroll;
+    overflow-x: hidden;
+    overflow-y: auto;
     max-height: 200pt;
   }
   #activity-understand .webpages > h3 {
@@ -122,6 +123,13 @@
   </div>
   <h1 id="activities-header" class="title">Activities</h1>
   <div id="activities">
+    <div id="activity-explore"
+      ng-click="activities.explore.startMain();"
+      ng-show="activities.explore.enabled"
+      />
+      <h2>Explore</h2>
+      <aside></aside>
+    </div>
     <div id="activity-geo"
       ng-click="activities.geo.startMain();"
       ng-show="activities.geo.enabled"
@@ -140,13 +148,6 @@
           <div ng-repeat="webpage in topic.understand.webpages" class="webpage"><a href="{{ webpage.url }}" target="content">{{ webpage.title }}</a></div>
         </div>
       </aside>
-    </div>
-    <div id="activity-explore"
-      ng-click="activities.explore.startMain();"
-      ng-show="activities.explore.enabled"
-      />
-      <h2>Explore</h2>
-      <aside></aside>
     </div>
     <div id="activity-learn"
       ng-click="activities.learn.startMain();"
