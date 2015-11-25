@@ -260,6 +260,14 @@ UnderstandActivity.prototype = {
     resultCallback(true);
   },
   getPanelContent : function(successCallback, errorCallback) {
+    if (this.topic.understand) {
+      return;
+    }
+    var data = this.topic.understand = {};
+    data.descriptionURL = this.topic.descriptionURL;
+    data.dbpediaID = dbpediaIDForTopic(this.topic).replace("dbpedia:", "");
+    data.wikipediaURL = "http://en.m.wikipedia.org/wiki/" + encodeURIComponent(data.dbpediaID);
+
     var self = this;
     var query = "SELECT ?abstract FROM <http://dbpedia.org> WHERE { " +
       esc(dbpediaIDForTopic(this.topic)) + " dbpedia-owl:abstract ?abstract . " +
@@ -273,17 +281,13 @@ UnderstandActivity.prototype = {
         abstract = abstract.substr(0, 200);
         abstract += "… (More…)";
       }
-      self.topic.abstract = abstract;
+      data.abstract = abstract;
       successCallback();
     }, errorCallback);
   },
   startMain : function() {
-    var url = this.topic.descriptionURL;
-    if ( !url) {
-      var id = dbpediaIDForTopic(this.topic).replace("dbpedia:", "");
-      url = "http://en.m.wikipedia.org/wiki/" + encodeURIComponent(id);
-    }
-    loadContentPage(url, "Understand " + this.topic.title);
+    var url = this.topic.understand.descriptionURL || this.topic.understand.wikipediaURL;
+    loadContentPage(url , "Understand " + this.topic.title);
   },
 }
 extend(UnderstandActivity, Activity);

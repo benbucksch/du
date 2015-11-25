@@ -74,6 +74,9 @@
   .w2ui-resizer {
     background-color: #D2D2D2 !important;
   }
+  a {
+    text-decoration: none;
+  }
 </style>
 
 <script type="text/javascript" src="lib/angular.js"></script>
@@ -107,7 +110,11 @@
       ng-click="activities.understand.startMain();"
       />
       <h2>Understand</h2>
-      <aside><div ng-show="topic.abstract">{{ topic.abstract }}</div></aside>
+      <aside>
+        <div ng-show="topic.understand.abstract">{{ topic.understand.abstract }}</div>
+        <div ng-show="topic.understand.descriptionURL"><a href="{{ topic.understand.descriptionURL }}" target="content">Description</a></div>
+        <div ng-show="topic.understand.wikipediaURL"><a href="{{ topic.understand.wikipediaURL }}" target="content">Wikipedia</a></div>
+      </aside>
     </div>
     <div id="activity-explore"
       ng-click="activities.explore.startMain();"
@@ -183,7 +190,7 @@
 
 <section id="content-pane" class="ui-layout-center">
   <h1 id="title" class="title">Labrasol</h1>
-  <iframe id="content"></iframe>
+  <iframe id="content" name="content"></iframe>
 </section>
 
 </body>
