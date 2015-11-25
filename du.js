@@ -269,7 +269,13 @@ UnderstandActivity.prototype = {
     data.dbpediaID = dbpediaURI.replace("dbpedia:", "");
     data.wikipediaURL = "http://en.m.wikipedia.org/wiki/" + encodeURIComponent(data.dbpediaID);
 
+    var w = new Waiter(function() {
+      successCallback();
+    }, errorCallback);
+    var successAbstract = w.success();
+    var successWebpages = w.success();
     var self = this;
+
     var query = "SELECT ?abstract FROM <http://dbpedia.org> WHERE { " +
       esc(dbpediaURI) + " dbpedia-owl:abstract ?abstract . " +
       "filter(langMatches(lang(?abstract), '" + getLang() + "')) " + // one lang
@@ -284,13 +290,13 @@ UnderstandActivity.prototype = {
         abstract += "… (More…)";
       }
       data.abstract = abstract;
-    }, errorCallback);
+      successAbstract();
+    }, w.error());
 
     query = "SELECT * FROM <http://dbpedia.org> WHERE { " +
       esc(dbpediaURI) + " dbpedia-owl:wikiPageExternalLink ?url . " +
     "} LIMIT 30";
     sparqlSelect(query, {}, function(results) {
-      ddebug("websites returned: " + JSON.stringify(results, " "));
       data.webpages = results.map(function(result) {
         // TODO dbpedia doesn't store the title. Use first host component of URL.
         var title = capitalize(result.url.replace(/.*:\/\/(www\.)?/, "").replace(/\..*/, ""));
@@ -299,8 +305,8 @@ UnderstandActivity.prototype = {
           title : title,
         };
       });
-      successCallback();
-    }, errorCallback);
+      successWebpages();
+    }, w.error());
   },
   startMain : function() {
     var url = this.topic.understand.descriptionURL || this.topic.understand.wikipediaURL;

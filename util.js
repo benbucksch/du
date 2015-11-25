@@ -516,3 +516,52 @@ NoResult.prototype =
 {
 }
 extend(NoResult, Exception);
+
+/**
+ * Allows to call many async functions,
+ * and wait for them *all* to complete.
+        var w = new Waiter(successCallback, errorCallback);
+        for (var lang in allLangStorages) {
+          var storage = allLangStorages[lang];
+          lodTitles(storage, lang, w.success(), w.error());
+          lodDescrs(storage, lang, w.success(), w.error());
+        }
+ */
+function Waiter(successCallback, errorCallback) {
+  assert(typeof(successCallback) == "function", "Need successCallback");
+  assert(typeof(errorCallback) == "function", "Need errorCallback");
+  this.successCallback = successCallback;
+  this.errorCallback = errorCallback;
+  this.waiting = 0;
+  this.hadError = false;
+}
+Waiter.prototype = {
+  // config
+  kReportOnlyFirstError : true,
+  kSuccessAfterError : false,
+
+  // get callbacks
+  success : function() {
+    var self = this;
+    self.waiting++;
+    return function() {
+      if (--self.waiting == 0 &&
+          (self.successAfterError || !self.hadError)) {
+        self.successCallback();
+      }
+    };
+  },
+  error : function() {
+    var self = this;
+    return function(e) {
+      if ( !self.hadError || !self.kReportOnlyFirstError) {
+        self.hadError = true;
+        self.errorCallback(e);
+      }
+      if (--self.waiting == 0 &&
+          self.kSuccessAfterError) {
+        self.successCallback();
+      }
+    };
+  },
+}
