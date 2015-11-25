@@ -89,6 +89,10 @@ function onMove(latCenter, longCenter, zoomLevel,
           tState.title = addr.state;
           tState.id = stateID;
           tState.img = "placeholder.png";
+          tState.geo = {
+            lat : latCenter,
+            lon : longCenter,
+          };
           tState.addToParent(tCountry);
         }
         tLowest = tState;
@@ -101,6 +105,10 @@ function onMove(latCenter, longCenter, zoomLevel,
           tCity.title = addr.city;
           tCity.id = cityID;
           tCity.img = "placeholder.png";
+          tCity.geo = {
+            lat : latCenter,
+            lon : longCenter,
+          };
           tCity.addToParent(tLowest);
         }
         tLowest = tCity;
