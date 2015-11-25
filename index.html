@@ -106,12 +106,11 @@
   </div>
   <h1 id="activities-header" class="title">Activities</h1>
   <div id="activities">
-    <div id="activity-understand"
-      ng-click="activities.understand.startMain();"
-      />
-      <h2>Understand</h2>
+    <div id="activity-understand">
+      <h2 ng-click="activities.understand.startMain();">Understand</h2>
       <aside>
-        <div ng-show="topic.understand.abstract">{{ topic.understand.abstract }}</div>
+        <div ng-show="topic.understand.abstract"
+          ng-click="activities.understand.startMain();">{{ topic.understand.abstract }}</div>
         <div ng-show="topic.understand.descriptionURL"><a href="{{ topic.understand.descriptionURL }}" target="content">Description</a></div>
         <div ng-show="topic.understand.wikipediaURL"><a href="{{ topic.understand.wikipediaURL }}" target="content">Wikipedia</a></div>
       </aside>
