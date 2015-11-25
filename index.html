@@ -77,6 +77,20 @@
   a {
     text-decoration: none;
   }
+  #activity-understand .webpages {
+    margin-left: 5px;
+    margin-top: 5px;
+  }
+  #activity-understand .webpages > h3 {
+    margin-bottom: 5px;
+    padding: 0 2px;
+    font-size: inherit;
+  }
+  #activity-understand .webpage {
+    padding-top: 0;
+    padding-bottom: 0;
+    border-bottom: 1px dotted lightgrey;
+  }
 </style>
 
 <script type="text/javascript" src="lib/angular.js"></script>
@@ -113,6 +127,10 @@
           ng-click="activities.understand.startMain();">{{ topic.understand.abstract }}</div>
         <div ng-show="topic.understand.descriptionURL"><a href="{{ topic.understand.descriptionURL }}" target="content">Description</a></div>
         <div ng-show="topic.understand.wikipediaURL"><a href="{{ topic.understand.wikipediaURL }}" target="content">Wikipedia</a></div>
+        <div class="webpages" ng-show="topic.understand.webpages &amp;&amp; topic.understand.webpages.length &gt; 0">
+          <h3>Websites</h2>
+          <div ng-repeat="webpage in topic.understand.webpages" class="webpage"><a href="{{ webpage.url }}" target="content">{{ webpage.title }}</a></div>
+        </div>
       </aside>
     </div>
     <div id="activity-explore"
