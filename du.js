@@ -277,6 +277,7 @@ UnderstandActivity.prototype = {
       var abstract = result.abstract;
       ddebug("Got abstract " + abstract);
       assert(abstract && abstract.length, "No abstract found for: " + self.topic.title);
+      abstract = abstract.replace(/ *\(.*?\)/g, "");
       if (abstract.length > 200) {
         abstract = abstract.substr(0, 200);
         abstract += "… (More…)";
