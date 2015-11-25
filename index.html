@@ -80,6 +80,8 @@
   #activity-understand .webpages {
     margin-left: 5px;
     margin-top: 5px;
+    overflow-y: scroll;
+    max-height: 200pt;
   }
   #activity-understand .webpages > h3 {
     margin-bottom: 5px;
@@ -114,17 +116,23 @@
 
 <section id="activities-pane" class="ui-layout-west">
   <div id="topic-header"
-     hg-show="topic && topic.title">
-    <img class="icon" src="{{ topic.iconURL }}"></img>
+     hg-show="topic &amp;&amp; topic.title">
+    <img class="icon" src="{{ topic.iconURL }}" hg-show="topic.iconURL"></img>
     <h1 class="title">{{ topic.title }}</h1>
   </div>
   <h1 id="activities-header" class="title">Activities</h1>
   <div id="activities">
+    <div id="activity-geo"
+      ng-click="activities.geo.startMain();"
+      ng-show="activities.geo.enabled"
+      />
+      <h2>Locate</h2>
+      <aside></aside>
+    </div>
     <div id="activity-understand">
       <h2 ng-click="activities.understand.startMain();">Understand</h2>
       <aside>
-        <div ng-show="topic.understand.abstract"
-          ng-click="activities.understand.startMain();">{{ topic.understand.abstract }}</div>
+        <div ng-show="topic.understand.abstract">{{ topic.understand.abstract }}</div>
         <div ng-show="topic.understand.descriptionURL"><a href="{{ topic.understand.descriptionURL }}" target="content">Description</a></div>
         <div ng-show="topic.understand.wikipediaURL"><a href="{{ topic.understand.wikipediaURL }}" target="content">Wikipedia</a></div>
         <div class="webpages" ng-show="topic.understand.webpages &amp;&amp; topic.understand.webpages.length &gt; 0">
@@ -138,13 +146,6 @@
       ng-show="activities.explore.enabled"
       />
       <h2>Explore</h2>
-      <aside></aside>
-    </div>
-    <div id="activity-geo"
-      ng-click="activities.geo.startMain();"
-      ng-show="activities.geo.enabled"
-      />
-      <h2>Locate</h2>
       <aside></aside>
     </div>
     <div id="activity-learn"
