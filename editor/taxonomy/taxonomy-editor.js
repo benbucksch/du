@@ -2,6 +2,7 @@ var app = angular.module('duTopicEditor',[])
 .controller("Topic", function($scope) {
 })
 .controller("Taxonomy", function($scope) {
+  $scope.rootTopic = null;
   $scope.loadURL = window.location.origin + "/uninav/taxonomy.json";
   $scope.loadTaxonomyFile = loadTaxonomyFile;
   $scope.loadTaxonomyIntoUI = loadTaxonomyIntoUI;
@@ -15,6 +16,9 @@ app.run(function($rootScope) {
 
 function topicScope() {
   return angular.element(E("topic")).scope();
+}
+function taxonomyScope() {
+  return angular.element(E("tree")).scope();
 }
 
 var gTreeView;
@@ -37,6 +41,8 @@ function loadTaxonomyFile(files) {
 function loadTaxonomyIntoUI(url) {
   // from uninav/data.js
   loadTaxonomyJSON(url, function(rootTopic, allByID) {
+    taxonomyScope().rootTopic = rootTopic;
+
     gTreeView = new TreeView(E("treeview"), rootTopic,
     function(topic) { // on select
       ddebug("Switching to topic " + topic.title);
@@ -50,5 +56,8 @@ function loadTaxonomyIntoUI(url) {
   }, errorCritical);
 }
 
-function saveTaxonomy() {
+function saveTaxonomy(rootTopic) {
+  // from uninav/data.js
+  var json = exportTaxonomyJSON(rootTopic);
+  downloadFromVariable(JSON.stringify(json, null, " ") + "\n", "text/json");
 }
