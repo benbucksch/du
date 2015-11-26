@@ -1,5 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!doctype html>
-<html ng-app="duTopicEditor">
+<html xmlns="http://www.w3.org/1999/xhtml" ng-app="duTopicEditor">
 <head>
 <title>Labrasol</title>
 <meta charset="utf-8"></meta>
@@ -41,6 +42,7 @@
   .grid > li {
     display: table-row;
     border: inset 1px WindowFrame;
+    border-top: 10px;
   }
   .grid > li > * {
     display: table-cell;
@@ -55,11 +57,12 @@
     vertical-align: top;
   }
   #properties img {
-    margin-top: 10px;
+    margin-bottom: 15px;
   }
   #properties textarea {
     width: 40em;
     height: 10em;
+    margin-bottom: 5px;
   }
 
 </style>
@@ -118,29 +121,23 @@
             <label>Load from local file</label>
             <label>Upload server not yet implemented</label>
           </li>
-          <img src="{{ topic.iconURL }}" />
         </ul>
+        <img src="{{ topic.iconURL }}" />
       </div>
     </li>
     <li>
       <label>Short description</label>
       <div>
-        <textarea ng-model="description" />
+        <textarea ng-model="description"></textarea>
       </div>
     </li>
     <li>
-      <label>Understand  - Description page</label>
-      <div>
-        <img src="{{ topic.descriptionURL }}" />
-        <input type="url" ng-model="topic.descriptionURL" size="40" />
-      <div>
+      <label>Understand page</label>
+       <input type="url" ng-model="topic._descriptionURL" size="40" />
     </li>
     <li>
       <label>Explore - Animation</label>
-      <div>
-        <img src="{{ topic.exploreURL }}" />
-        <input type="url" ng-model="topic.exploreURL" size="40" />
-      <div>
+      <input type="url" ng-model="topic._exploreURL" size="40" />
     </li>
   </div>
 </section>
