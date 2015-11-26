@@ -2,10 +2,13 @@ var app = angular.module('duTopicEditor',[])
 .controller("Topic", function($scope) {
 })
 .controller("Taxonomy", function($scope) {
+  // Currently loaded taxonomy
   $scope.rootTopic = null;
+
+  // Menu: File load/save
   $scope.loadURL = window.location.origin + "/uninav/taxonomy.json";
-  $scope.loadTaxonomyFile = loadTaxonomyFile;
-  $scope.loadTaxonomyIntoUI = loadTaxonomyIntoUI;
+  $scope.onLoadTaxonomyURL = onLoadTaxonomyURL;
+  $scope.onLoadTaxonomyFile = onLoadTaxonomyFile;
   $scope.saveTaxonomy = saveTaxonomy;
 })
 ;
@@ -23,7 +26,16 @@ function taxonomyScope() {
 
 var gTreeView;
 
-function loadTaxonomyFile(files) {
+
+function onLoadTaxonomyURL(url) {
+  loadTaxonomyJSON(url, resultCallback, errorCallback);
+}
+
+function onLoadTaxonomyFile(files) {
+  loadTaxonomyFile(files, loadTaxonomyIntoUI, errorCritical);
+}
+
+function loadTaxonomyFile(files, resultCallback, errorCallback) {
   if (files.length == 0) {
     return;
   }
@@ -33,31 +45,29 @@ function loadTaxonomyFile(files) {
   var reader  = new FileReader();
   reader.onloadend = function() {
     var url = reader.result;
-    loadTaxonomyIntoUI(url);
+    // from uninav/data.js. Takes JSON, returns rootTopic to resultCallback.
+    loadTaxonomyJSON(url, resultCallback, errorCallback);
   }
   reader.readAsDataURL(file);
 }
 
-function loadTaxonomyIntoUI(url) {
-  // from uninav/data.js
-  loadTaxonomyJSON(url, function(rootTopic, allByID) {
-    taxonomyScope().rootTopic = rootTopic;
+function loadTaxonomyIntoUI(rootTopic) {
+  taxonomyScope().rootTopic = rootTopic;
 
-    gTreeView = new TreeView(E("treeview"), rootTopic,
-    function(topic) { // on select
-      ddebug("Switching to topic " + topic.title);
-      topicScope().$apply(function($scope) {
-        $scope.topic = topic;
-      });
-    },
-    function(parentTopic) { // on expand
-    },
-    errorCritical);
-  }, errorCritical);
+  gTreeView = new TreeView(E("treeview"), rootTopic,
+  function(topic) { // on select
+    ddebug("Switching to topic " + topic.title);
+    topicScope().$apply(function($scope) {
+      $scope.topic = topic;
+    });
+  },
+  function(parentTopic) { // on expand
+  },
+  errorCritical);
 }
 
 function saveTaxonomy(rootTopic) {
-  // from uninav/data.js
+  // from uninav/data.js. Takes rootTopic, returns JSON.
   var json = exportTaxonomyJSON(rootTopic);
   downloadFromVariable(JSON.stringify(json, null, " ") + "\n", "text/json");
 }
