@@ -1,6 +1,12 @@
 var app = angular.module('duTopicEditor',[])
 .controller("Topic", function($scope) {
 })
+.controller("Taxonomy", function($scope) {
+  $scope.loadURL = window.location.origin + "/uninav/taxonomy.json";
+  $scope.loadTaxonomyFile = loadTaxonomyFile;
+  $scope.loadTaxonomyIntoUI = loadTaxonomyIntoUI;
+  $scope.saveTaxonomy = saveTaxonomy;
+})
 ;
 
 app.run(function($rootScope) {
@@ -13,15 +19,7 @@ function topicScope() {
 
 var gTreeView;
 
-function openTaxonomyURL() {
-  var url = window.prompt("URL for taxonomy JSON", "Load taxonomy");
-  if ( !url) {
-    return;
-  }
-  loadTaxonomyIntoUI(url);
-}
-
-function openTaxonomyFile(files) {
+function loadTaxonomyFile(files) {
   if (files.length == 0) {
     return;
   }
@@ -41,11 +39,16 @@ function loadTaxonomyIntoUI(url) {
   loadTaxonomyJSON(url, function(rootTopic, allByID) {
     gTreeView = new TreeView(E("treeview"), rootTopic,
     function(topic) { // on select
-      alert("Showing " + topic.title);
-      topicScope().topic = topic;
+      ddebug("Switching to topic " + topic.title);
+      topicScope().$apply(function($scope) {
+        $scope.topic = topic;
+      });
     },
     function(parentTopic) { // on expand
     },
     errorCritical);
   }, errorCritical);
+}
+
+function saveTaxonomy() {
 }

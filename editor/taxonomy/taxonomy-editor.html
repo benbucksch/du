@@ -18,28 +18,37 @@
   }
 
   header {
-    height: 100px;
-    padding: 20px 10px;
+    height: 8em;
+    padding: 10px 10px;
   }
   #tree {
     position: fixed;
-    top: 100px;
+    top: 8em;
     left: 0;
     width: 30%;
   }
   #topic {
     position: fixed;
-    top: 100px;
+    top: 8em;
     right: 0;
     width: 65%;
   }
 
-  menu {
-    display: block;
+  #menu {
+    display: table;
   }
-  menuitem {
-    display: block;
+  #menu > li {
+    display: table-row;
+    border: inset 1px WindowFrame;
   }
+  #menu > li > * {
+    display: table-cell;
+    margin-bottom: 5px;
+  }
+  #menu > li > label {
+    padding-right: 15px;
+  }
+
 
 </style>
 
@@ -57,18 +66,29 @@
 <body>
 
 <header>
-  <menu>
-    <menuitem><button ng-click="openTaxonomyURL();">Load Taxonomy from URL</button></menuitem>
-    <menuitem>Load Taxonomy from local file: <input type="file" onchange="openTaxonomyFile(this.files);" /></menuitem>
-  </menu>
+  <ul id="menu" ng-controller="Taxonomy">
+    <li>
+      <label>Load Taxonomy from URL</label>
+      <input type="url" id="loadURL" ng-model="loadURL" size="40" />
+      <button ng-click="ddebug('test'); loadTaxonomyIntoUI(loadURL);" ng-show="loadURL">Load</button>
+    </li>
+    <li>
+      <label>Load Taxonomy from local file</label>
+      <input type="file" onchange="loadTaxonomyFile(this.files);" />
+    </li>
+    <li>
+      <label>Save taxonomy to file</label>
+      <button ng-click="saveTaxonomy();">Save</button>
+    </li>
+  </ul>
 </header>
 
-<section id="tree">
+<section id="tree" ng-controller="Taxonomy">
   <tree id="treeview"></tree>
 </section>
 
 <section id="topic" ng-controller="Topic">
-  <h1>Topic: {{ topic.title }}</h1>
+  <h1>{{ topic.title }}</h1>
 </section>
 
 </body>
