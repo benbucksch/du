@@ -69,6 +69,19 @@ function cTN(text) {
 }
 
 /**
+ * Turns a DOM |NodeList| into a JS array that you can |for each| on
+ * - convenience
+ * - makes a copy, which is needed when you remove the elements
+ */
+function nodeListToArray(nodeList)
+{
+  var result = [];
+  for (var i = 0, l = nodeList.length; i < l; i++)
+    result.push(nodeList.item(i));
+  return result;
+}
+
+/**
  * Like parentElement.insertBefore(newElement, insertBefore), just insert
  * after some other element.
  *
