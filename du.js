@@ -425,7 +425,7 @@ function NewsActivity() {
 NewsActivity.prototype = {
   startMain : function() {
     loadContentPage(
-        "http://" + gSite + "/activity-news.php",
+        "http://news.labrasol.com/activity-news.php?search=" + encodeURIComponent(this.topic.title),
         "News");
   },
 }
