@@ -1,0 +1,75 @@
+<!doctype html>
+<html ng-app="duTopicEditor">
+<head>
+<title>Labrasol</title>
+<meta charset="utf-8"></meta>
+<style>
+  /**
+  * (c) 2015 Ben Bucksch
+  * License: GPL3, see LICENSE
+  */
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    padding: 0 0 0 0;
+    margin: 0 0 0 0;
+    font-family: Helvetica, Arial, sans-serif;
+  }
+
+  header {
+    height: 100px;
+    padding: 20px 10px;
+  }
+  #tree {
+    position: fixed;
+    top: 100px;
+    left: 0;
+    width: 30%;
+  }
+  #topic {
+    position: fixed;
+    top: 100px;
+    right: 0;
+    width: 65%;
+  }
+
+  menu {
+    display: block;
+  }
+  menuitem {
+    display: block;
+  }
+
+</style>
+
+<script type="text/javascript" src="../../lib/angular.js"></script>
+
+<script type="text/javascript" src="../../util.js"></script>
+<script type="text/javascript" src="../../uiutil.js"></script>
+<script type="text/javascript" src="../../stringbundle.js"></script>
+<script type="text/javascript" src="../../treeview.js"></script>
+<link rel="stylesheet" type="text/css" href="../../treeview.css">
+
+<script type="text/javascript" src="taxonomy-editor.js"></script>
+<script type="text/javascript" src="../../../uninav/data.js"></script>
+</head>
+<body>
+
+<header>
+  <menu>
+    <menuitem><button ng-click="openTaxonomyURL();">Load Taxonomy from URL</button></menuitem>
+    <menuitem>Load Taxonomy from local file: <input type="file" onchange="openTaxonomyFile(this.files);" /></menuitem>
+  </menu>
+</header>
+
+<section id="tree">
+  <tree id="treeview"></tree>
+</section>
+
+<section id="topic" ng-controller="Topic">
+  <h1>Topic: {{ topic.title }}</h1>
+</section>
+
+</body>
+</html>
