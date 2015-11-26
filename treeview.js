@@ -52,7 +52,7 @@ TreeView.prototype = {
     nodeE.appendChild(openCloseE);
 
     // icon
-    var iconE = cE(node.iconURL ? "img", "div", "icon", {
+    var iconE = cE(node.iconURL ? "img" : "div", "icon", {
       src : node.iconURL,
     });
     nodeE.appendChild(iconE);
