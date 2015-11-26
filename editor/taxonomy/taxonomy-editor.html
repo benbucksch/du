@@ -19,7 +19,7 @@
 
   header {
     height: 8em;
-    padding: 10px 10px;
+    padding: 10px 30px;
   }
   #tree {
     position: fixed;
@@ -34,21 +34,33 @@
     width: 65%;
   }
 
-  #menu {
+  .grid {
     display: table;
+    padding: 0px;
   }
-  #menu > li {
+  .grid > li {
     display: table-row;
     border: inset 1px WindowFrame;
   }
-  #menu > li > * {
+  .grid > li > * {
     display: table-cell;
     margin-bottom: 5px;
+    padding: 0px;
   }
-  #menu > li > label {
+  .grid > li > label {
     padding-right: 15px;
   }
 
+  #properties label {
+    vertical-align: top;
+  }
+  #properties img {
+    margin-top: 10px;
+  }
+  #properties textarea {
+    width: 40em;
+    height: 10em;
+  }
 
 </style>
 
@@ -66,11 +78,11 @@
 <body>
 
 <header>
-  <ul id="menu" ng-controller="Taxonomy">
+  <ul id="menu" ng-controller="Taxonomy" class="grid">
     <li>
       <label>Load Taxonomy from URL</label>
-      <input type="url" id="loadURL" ng-model="loadURL" size="40" />
-      <button ng-click="ddebug('test'); loadTaxonomyIntoUI(loadURL);" ng-show="loadURL">Load</button>
+      <input type="url" ng-model="loadURL" size="40" />
+      <button ng-click="loadTaxonomyIntoUI(loadURL);" ng-show="loadURL">Load</button>
     </li>
     <li>
       <label>Load Taxonomy from local file</label>
@@ -87,8 +99,50 @@
   <tree id="treeview"></tree>
 </section>
 
-<section id="topic" ng-controller="Topic">
+<section id="topic" ng-controller="Topic" ng-show="topic">
   <h1>{{ topic.title }}</h1>
+  <div id="properties" class="grid">
+    <li>
+      <label>Title</label>
+      <input type="text" size="15" ng-model="topic.title" />
+    </li>
+    <li>
+      <label>Icon</label>
+      <div>
+        <ul class="grid">
+          <li>
+            <label>Load from URL</label>
+            <input type="url" ng-model="topic._iconFilename" size="40" />
+          </li>
+          <li>
+            <label>Load from local file</label>
+            <label>Upload server not yet implemented</label>
+          </li>
+          <img src="{{ topic.iconURL }}" />
+        </ul>
+      </div>
+    </li>
+    <li>
+      <label>Short description</label>
+      <div>
+        <textarea ng-model="description" />
+      </div>
+    </li>
+    <li>
+      <label>Understand  - Description page</label>
+      <div>
+        <img src="{{ topic.descriptionURL }}" />
+        <input type="url" ng-model="topic.descriptionURL" size="40" />
+      <div>
+    </li>
+    <li>
+      <label>Explore - Animation</label>
+      <div>
+        <img src="{{ topic.exploreURL }}" />
+        <input type="url" ng-model="topic.exploreURL" size="40" />
+      <div>
+    </li>
+  </div>
 </section>
 
 </body>
