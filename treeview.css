@@ -18,6 +18,12 @@
   line-height: 16px;
   display: inline-block;
   vertical-align: text-top;
+
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: pointer;
 }
 
 .treeview .icon {

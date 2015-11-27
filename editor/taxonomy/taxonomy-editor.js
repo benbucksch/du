@@ -28,7 +28,8 @@ var gTreeView;
 
 
 function onLoadTaxonomyURL(url) {
-  loadTaxonomyJSON(url, resultCallback, errorCallback);
+  // from uninav/data.js. Takes JSON, returns rootTopic to resultCallback.
+  loadTaxonomyJSON(url, loadTaxonomyIntoUI, errorCritical);
 }
 
 function onLoadTaxonomyFile(files) {
