@@ -71,7 +71,13 @@ function _cleanupStack(s) {
     }).join("\n");
 }
 
-
+function runAsync(func, errorCallback) {
+  setTimeout(function() {
+    try {
+      func();
+    } catch (e) { errorCallback(e); }
+  }, 0);
+}
 
 /**
  * Parses a URL query string into an object.
@@ -116,6 +122,9 @@ function getLang() {
 }
 
 
+/**
+ * To insert string into SPARQL
+ */
 function esc(str) {
   // TODO
   return str
@@ -126,7 +135,7 @@ function esc(str) {
     .replace(/\)/g, "%29");
 }
 
-function dbpediaID(title) {
+function dbpediaIDForTitle(title) {
   title = title
       .replace(/ \&.*/g, "") // HACK: With "A&B", take only A
       .replace(/, .*/g, "") // HACK: With "A, B & C", take only A
@@ -152,6 +161,7 @@ var cRDFPrefixes = {
   factbook: "http://wifo5-04.informatik.uni-mannheim.de/factbook/ns#",
   owl: "http://www.w3.org/2002/07/owl#",
   skos: "http://www.w3.org/2004/02/skos/core#",
+  du: "http://rdf.labrasol.com/",
 };
 
 function sparqlSelect(query, params, resultCallback, errorCallback) {

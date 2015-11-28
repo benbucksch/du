@@ -82,10 +82,14 @@ function startupTopic() {
       title = "Labrasol"; // TODO default page
     }
   }
-  return { // Fake topic
+
+  // Fake topic
+  // For startup. Can't use a real Topic, because uninav/data.js is not loaded yet.
+  var topic = {
     title : title,
-    lodID : "dbpedia:" + title.split(" ")[0],
   };
+  topic.lodID = topic.dbpediaID = "dbpedia:" + title.split(" ")[0];
+  return topic;
 }
 
 function onLoad() {
@@ -195,6 +199,7 @@ function AllActivity() {
 AllActivity.prototype = {
   enabled : true,
   setTopic : function(topic, successCallback, errorCallback) {
+    // TODO use Waiter
     var waiting = 0;
     var done = function() {
       if (--waiting == 0) {
@@ -265,44 +270,54 @@ UnderstandActivity.prototype = {
     }
     var data = this.topic.understand = {};
     data.descriptionURL = this.topic.descriptionURL;
-    var dbpediaURI = dbpediaIDForTopic(this.topic);
-    data.dbpediaID = dbpediaURI.replace("dbpedia:", "");
-    data.wikipediaURL = "http://en.m.wikipedia.org/wiki/" + encodeURIComponent(data.dbpediaID);
+    data.wikipediaURL = "http://en.m.wikipedia.org/wiki/" + encodeURIComponent(
+        this.topic.dbpediaID.replace("dbpedia:", ""));
 
     var w = new Waiter(function() {
       successCallback();
     }, errorCallback);
-    var successAbstract = w.success();
-    var successWebpages = w.success();
     var self = this;
 
-    var query = "SELECT ?abstract FROM <http://dbpedia.org> WHERE { " +
-      esc(dbpediaURI) + " dbpedia-owl:abstract ?abstract . " +
-      "filter(langMatches(lang(?abstract), '" + getLang() + "')) " + // one lang
-    "}";
-    sparqlSelect1(query, {}, function(result) {
-      var abstract = result.abstract;
-      ddebug("Got abstract " + abstract);
-      assert(abstract && abstract.length, "No abstract found for: " + self.topic.title);
-      abstract = abstract.replace(/ *\(.*?\)/g, "");
-      if (abstract.length > 200) {
-        abstract = abstract.substr(0, 200);
-        abstract += "… (More…)";
-      }
-      data.abstract = abstract;
-      successAbstract();
-    }, w.error());
+    if (this.topic.description) {
+      data.abstract = this.topic.description;
+    } else {
+      var query = "SELECT ?abstract FROM <http://dbpedia.org> WHERE { " +
+        esc(this.topic.dbpediaID) + " dbpedia-owl:abstract ?abstract . " +
+        "filter(langMatches(lang(?abstract), '" + getLang() + "')) " + // one lang
+      "}";
+      var successAbstract = w.success();
+      sparqlSelect1(query, {}, function(result) {
+        var abstract = result.abstract;
+        ddebug("Got abstract " + abstract);
+        assert(abstract && abstract.length, "No abstract found for: " + self.topic.title);
+        abstract = abstract.replace(/ *\(.*?\)/g, "");
+        if (abstract.length > 200) {
+          abstract = abstract.substr(0, 200);
+          abstract += "… (More…)";
+        }
+        data.abstract = abstract;
+        successAbstract();
+      }, w.error());
+    }
 
-    query = "SELECT * FROM <http://dbpedia.org> WHERE { " +
-      esc(dbpediaURI) + " dbpedia-owl:wikiPageExternalLink ?url . " +
-    "} LIMIT 30";
+     //query = "SELECT * FROM <http://dbpedia.org> WHERE { " +
+    //  esc(this.topic.dbpediaID) + " dbpedia-owl:wikiPageExternalLink ?url . " +
+    // dbpedia doesn't store the title
+    query = "SELECT * FROM <http://dmoz.org> WHERE { " +
+       " ?topic dmoz:link ?url . " +
+       " { OPTIONAL ?topic dc:Title ?title } " +
+       " { OPTIONAL ?topic dc:Description ?description } " +
+    "} LIMIT 30"
+        .replace("?topic", "<" + this.topic.lodID + ">");
+    var successWebpages = w.success();
     sparqlSelect(query, {}, function(results) {
       data.webpages = results.map(function(result) {
-        // TODO dbpedia doesn't store the title. Use first host component of URL.
+        // Fallback: Use first host component of URL as title
         var title = capitalize(result.url.replace(/.*:\/\/(www\.)?/, "").replace(/\..*/, ""));
         return {
           url : result.url,
-          title : title,
+          title : result.title || title,
+          description : result.description,
         };
       });
       successWebpages();
@@ -338,7 +353,7 @@ GeoActivity.prototype = {
     }
     var self = this;
     var query = "SELECT * FROM <http://dbpedia.org> WHERE {" +
-      esc(dbpediaIDForTopic(this.topic)) + " geo:lat ?lat ; " +
+      esc(this.topic.dbpediaID) + " geo:lat ?lat ; " +
       " geo:long ?lon . " +
     "}";
     sparqlSelect1(query, {}, function(result) {
@@ -444,13 +459,6 @@ function clearContentPage() {
   E("content").src = "";
 }
 
-
-function dbpediaIDForTopic(topic) {
-  if ( !topic.lodID) {
-    topic.lodID = dbpediaID(topic.title);
-  }
-  return topic.lodID;
-}
 
 function capitalize(word) {
   return word[0].toUpperCase() + word.substr(1).toLowerCase();
