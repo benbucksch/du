@@ -308,7 +308,7 @@ UnderstandActivity.prototype = {
        " { OPTIONAL ?topic dc:Title ?title } " +
        " { OPTIONAL ?topic dc:Description ?description } " +
     "} LIMIT 30"
-    query = query.replace("?topic", "<" + this.topic.lodID + ">");
+    query = query.replaceAll("?topic", "<" + this.topic.lodID + ">");
     var successWebpages = w.success();
     sparqlSelect(query, {}, function(results) {
       data.webpages = results.map(function(result) {

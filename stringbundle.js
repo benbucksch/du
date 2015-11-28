@@ -238,9 +238,10 @@ StringBundle.readURLasUTF8 = function(url)
  */
 StringBundle.splitLines = function(content)
 {
-  content = content.replace("\r\n", "\n");
-  content = content.replace("\r", "\n");
-  return content.split("\n");
+  return content
+    .replaceAll("\r\n", "\n")
+    .replaceAll("\r", "\n")
+    .split("\n");
 }
 
 /**
