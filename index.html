@@ -91,6 +91,29 @@
     padding-bottom: 0;
     border-bottom: 1px dotted lightgrey;
   }
+
+  #activity-credits > aside {
+    overflow: auto;
+  }
+  #activity-credits > aside > div.intro {
+    margin: 3px;
+  }
+  #activity-credits > aside > div {
+    margin: 0px;
+    padding: 0px;
+  }
+  #activity-credits > aside > div {
+    margin: 0px;
+    padding: 0px;
+  }
+  #activity-credits table,
+  #activity-credits tr {
+    background: inherit;
+  }
+  #activity-credits font,
+  #activity-credits a {
+    color: inherit;
+  }
 </style>
 
 <script type="text/javascript" src="lib/angular.js"></script>
@@ -195,10 +218,32 @@
     </div>
     <div id="activity-credits"
       ng-click="activities.credits.startMain();"
-      ng-show="activities.credits.enabled"
       />
       <h2>Credits</h2>
-      <aside></aside>
+      <aside>
+        <div class="intro">
+          Created with information from
+        </div>
+        <div id="credits-dmoz">
+          <table border="0" bgcolor="#336600" cellpadding="3" cellspacing="0">
+          <tr><td>
+          <table width="100%" cellpadding="2" cellspacing="0" border="0">
+          <tr align="center"><td>
+          <font face="sans-serif, Arial, Helvetica" size="2" color="#ffffff">
+          Help build the largest human-edited directory on the web.
+          </font>
+          </td></tr>
+          <tr bgcolor="#CCCCCC" align="center">
+          <td><font face="sans-serif, Arial, Helvetica" size="2">
+          <a href="http://www.dmoz.org/public/suggest?cat=$cat">Suggest a Site</a> -
+          <a href="http://www.dmoz.org/about.html"><b>Open Directory Project</b></a> -
+          <a href="http://www.dmoz.org/public/apply?cat=$cat">Become an Editor</a>
+          </font></td></tr>
+          </table>
+          </td></tr>
+          </table>
+        </div>
+      </aside>
     </div>
   </div>
 </section>
