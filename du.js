@@ -124,7 +124,7 @@ var app = angular.module("duTopic", [])
   })
   .filter("shortenText", function() {
     return function(text, len) {
-      if (text.length > len) {
+      if (text && text.length && text.length > len) {
         text = text.substr(0, len);
         text += "…";
       }
