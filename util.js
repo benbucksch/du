@@ -588,8 +588,8 @@ function Waiter(successCallback, errorCallback) {
 }
 Waiter.prototype = {
   // config
-  kReportOnlyFirstError : true,
-  kSuccessAfterError : false,
+  reportOnlyFirstError : true,
+  successAfterError : false,
 
   // get callbacks
   success : function() {
@@ -605,12 +605,12 @@ Waiter.prototype = {
   error : function() {
     var self = this;
     return function(e) {
-      if ( !self.hadError || !self.kReportOnlyFirstError) {
+      if ( !self.hadError || !self.reportOnlyFirstError) {
         self.hadError = true;
         self.errorCallback(e);
       }
       if (--self.waiting == 0 &&
-          self.kSuccessAfterError) {
+          self.successAfterError) {
         self.successCallback();
       }
     };

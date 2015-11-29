@@ -46,17 +46,6 @@ function openTopic(topic, changeMode) {
       gScope.topic = topic;
       E("title").textContent = topic.title;
 
-      gActivities.setTopic(topic, function() {
-        if (changeMode == 0 || changeMode == 1) {
-          // Change content
-          gActivities.startMain();
-        }
-        gScope.$apply();
-      }, function(e) {
-        errorCritical(e);
-        gScope.$apply();
-      });
-
       if (changeMode == 1 || changeMode == 2) {
         // Change TopicNav
         //var uninav = E("topicnav").contentWindow;
@@ -64,6 +53,18 @@ function openTopic(topic, changeMode) {
       }
     } catch (e) { errorCritical(e); }
   });
+  try {
+    gActivities.setTopic(topic, function() {
+      if (changeMode == 0 || changeMode == 1) {
+        // Change content
+        gActivities.startMain();
+      }
+      gScope.$apply();
+    }, function(e) {
+      errorNonCritical(e);
+      gScope.$apply();
+    });
+  } catch (e) { errorCritical(e); }
 }
 
 /**
@@ -199,17 +200,11 @@ function AllActivity() {
 AllActivity.prototype = {
   enabled : true,
   setTopic : function(topic, successCallback, errorCallback) {
-    // TODO use Waiter
-    var waiting = 0;
-    var done = function() {
-      if (--waiting == 0) {
-        successCallback();
-      }
-    };
+    var w = new Waiter(successCallback, errorCallback);
+    w.successAfterError = true;
     for (var name in this.activities) {
       var activity = this.activities[name];
-      waiting++;
-      activity.setTopic(topic, done, done);
+      activity.setTopic(topic, w.success(), w.error());
     }
   },
   /**
@@ -266,7 +261,7 @@ UnderstandActivity.prototype = {
   },
   getPanelContent : function(successCallback, errorCallback) {
     if (this.topic.understand) {
-      setTimeout(successCallback, 0);
+      successCallback();
     }
     var data = this.topic.understand = {};
     data.descriptionURL = this.topic.descriptionURL;
@@ -276,6 +271,7 @@ UnderstandActivity.prototype = {
     var w = new Waiter(function() {
       successCallback();
     }, errorCallback);
+    w.successAfterError = true;
     var self = this;
 
     if (this.topic.description) {
