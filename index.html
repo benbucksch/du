@@ -141,7 +141,7 @@
         <div ng-show="topic.understand.wikipediaURL"><a href="{{ topic.understand.wikipediaURL }}" target="content">Wikipedia</a></div>
         <div class="webpages" ng-show="topic.understand.webpages &amp;&amp; topic.understand.webpages.length &gt; 0">
           <h3>Websites</h2>
-          <div ng-repeat="webpage in topic.understand.webpages" class="webpage"><a href="{{ webpage.url }}" target="content">{{ webpage.title }}</a></div>
+          <div ng-repeat="webpage in topic.understand.webpages" class="webpage"><a href="{{ webpage.url }}" target="content" title="{{ webpage.description }}">{{ webpage.title }}</a></div>
         </div>
       </aside>
     </div>
