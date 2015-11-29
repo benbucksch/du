@@ -305,8 +305,8 @@ UnderstandActivity.prototype = {
     // dbpedia doesn't store the title
     query = "SELECT * FROM <http://dmoz.org> WHERE { " +
        " ?topic dmoz:link ?url . " +
-       " { OPTIONAL ?topic dc:Title ?title } " +
-       " { OPTIONAL ?topic dc:Description ?description } " +
+       " OPTIONAL { ?url dc10:Title ?title } . " +
+       " OPTIONAL { ?url dc10:Description ?description } . " +
     "} LIMIT 30"
     query = query.replaceAll("?topic", "<" + this.topic.lodID + ">");
     var successWebpages = w.success();
