@@ -303,12 +303,13 @@ UnderstandActivity.prototype = {
      //query = "SELECT * FROM <http://dbpedia.org> WHERE { " +
     //  esc(this.topic.dbpediaID) + " dbpedia-owl:wikiPageExternalLink ?url . " +
     // dbpedia doesn't store the title
-    query = "SELECT * FROM <http://dmoz.org> WHERE { " +
+    query = "SELECT ?url (SAMPLE(?title) as ?title) (SAMPLE(?description) as ?description)" +
+       "FROM <http://dmoz.org> WHERE { " +
        " ?topic dmoz:link ?url . " +
-       " OPTIONAL { ?url dc10:Title ?title } . " +
-       " OPTIONAL { ?url dc10:Description ?description } . " +
-    "} LIMIT 30"
-    query = query.replaceAll("?topic", "<" + this.topic.lodID + ">");
+       " OPTIONAL { ?url dc:title ?title } . " +
+       " OPTIONAL { ?url dc:description ?description } . " +
+    "} GROUP BY ?url LIMIT 30"
+      query = query.replaceAll("?topic", "<" + this.topic.lodID + ">");
     var successWebpages = w.success();
     sparqlSelect(query, {}, function(results) {
       data.webpages = results.map(function(result) {
