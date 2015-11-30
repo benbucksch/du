@@ -216,11 +216,9 @@
       <h2>Create</h2>
       <aside></aside>
     </div>
-    <div id="activity-credits"
-      ng-click="activities.credits.startMain();"
-      />
-      <h2>Credits</h2>
-      <aside>
+    <div id="activity-credits" />
+      <h2 ng-click="activities.credits.collapsed = !activities.credits.collapsed">Credits</h2>
+      <aside ng-show="activities.credits.collapsed">
         <div class="intro">
           Created with information from
         </div>
@@ -235,9 +233,9 @@
           </td></tr>
           <tr bgcolor="#CCCCCC" align="center">
           <td><font face="sans-serif, Arial, Helvetica" size="2">
-          <a href="http://www.dmoz.org/public/suggest?cat=$cat">Suggest a Site</a> -
+          <a href="http://www.dmoz.org/public/suggest?cat={{ topic.categoryPath }}">Suggest a Site</a> -
           <a href="http://www.dmoz.org/about.html"><b>Open Directory Project</b></a> -
-          <a href="http://www.dmoz.org/public/apply?cat=$cat">Become an Editor</a>
+          <a href="http://www.dmoz.org/public/apply?cat={{ topic.categoryPath }}">Become an Editor</a>
           </font></td></tr>
           </table>
           </td></tr>
