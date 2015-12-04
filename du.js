@@ -39,20 +39,22 @@ var uninav; // set by uninav.js
  *     stays as-is.
  */
 function openTopic(topic, changeMode) {
-  gScope.$apply(function() {
-    try {
-      changeMode = changeMode || 0;
+  try {
+    changeMode = changeMode || 0;
 
-      gScope.topic = topic;
-      E("title").textContent = topic.title;
+    gScope.topic = topic;
+    console.log("Setting topic to " + topic.title);
+    E("title").textContent = topic.title;
 
-      if (changeMode == 1 || changeMode == 2) {
-        // Change TopicNav
-        //var uninav = E("topicnav").contentWindow;
-        uninav.showTopic(topic);
-      }
-    } catch (e) { errorCritical(e); }
-  });
+    if (changeMode == 1 || changeMode == 2) {
+      // Change TopicNav
+      //var uninav = E("topicnav").contentWindow;
+      uninav.showTopic(topic);
+    }
+    if( !gScope.$$phase) {
+      gScope.$apply();
+    }
+  } catch (e) { errorCritical(e); }
   try {
     gActivities.setTopic(topic, function() {
       if (changeMode == 0 || changeMode == 1) {
@@ -117,10 +119,9 @@ var app = angular.module("duTopic", [])
     gScope = $scope;
     gActivities = new AllActivity();
     gScope.activities = gActivities.activities;
+    gScope.openTopic = openTopic;
 
-    setTimeout(function() { // https://docs.angularjs.org/error/$rootScope/inprog?p0=$apply
-      openTopic(startupTopic());
-    }, 0);
+    openTopic(startupTopic());
   })
   .filter("shortenText", function() {
     return function(text, len) {
