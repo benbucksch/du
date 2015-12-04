@@ -431,8 +431,9 @@ function CreateActivity() {
   gScope.user = { username : "ben" };
 
   // we use |gScope.user| below, so refresh when user logs in or out
+  var self = this;
   gScope.$watch("user", function() {
-    this.getEnabled(function() {}, errorNonCritical);
+    self.getEnabled(function() {}, errorNonCritical);
   });
 }
 CreateActivity.prototype = {
@@ -445,7 +446,7 @@ CreateActivity.prototype = {
       return;
     }
     if (this.topic.curator) {
-      this.setIsCurator(this.topic.curator == gScope.user);
+      this.setIsCurator(this.topic.curator.username == gScope.user.username);
       resultCallback(this.enabled);
       return;
     }
