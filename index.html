@@ -222,7 +222,8 @@
       <h2 ng-click="activities.create.collapsed = !activities.create.collapsed">Create</h2>
       <aside ng-hide="activities.create.collapsed">
         <div class="youarecurator" ng-show="activities.create.isCuratorHere">You are Curator for this topic. Please edit all aspects to your heart's content. Be competent, fair and brave.</div>
-        <div class="edit-topic"><a href="topic-edit.html?mode=edit-current" target="content">Edit primary data of this topic</a></div>
+        <div class="curatoris" ng-show="topic.curator &amp;&amp; !activities.create.isCuratorHere">This topic is curated by {{ username }}</div>
+        <div class="edit-topic" ng-show="activities.create.isCuratorHere"><a href="topic-edit.html?mode=edit-current" target="content">Edit primary data of this topic</a></div>
         <div class="edit-links" ng-show="activities.create.isCuratorHere"><a href="links-edit.html" target="content">Edit links in Understand</a></div>
         <div class="subtopics list" ng-show="topic.children.length">
           <h3>Sub-Topics</h2>

@@ -426,15 +426,52 @@ extend(WatchActivity, Activity);
 
 function CreateActivity() {
   Activity.call(this);
+
+  // TODO implement
+  gScope.user = { username : "ben" };
+
+  // we use |gScope.user| below, so refresh when user logs in or out
+  gScope.$watch("user", function() {
+    this.getEnabled(function() {}, errorNonCritical);
+  });
 }
 CreateActivity.prototype = {
   isCuratorHere : false,
 
   getEnabled : function(resultCallback, errorCallback) {
-    this.isCuratorHere = true; // TODO implement
-    this.enabled = this.isCuratorHere;
-    this.collapsed = !this.enabled;
-    resultCallback(this.enabled);
+    if ( !gScope.user) {
+      this.setIsCurator(false);
+      resultCallback(this.enabled);
+      return;
+    }
+    if (this.topic.curator) {
+      this.setIsCurator(this.topic.curator == gScope.user);
+      resultCallback(this.enabled);
+      return;
+    }
+    this.setIsCurator(false); // until we get new data
+    var self = this;
+    var query = "SELECT * FROM <http://dmoz.org> WHERE { " +
+        "?topic du:curator ?user . }";
+    query = query.replaceAll("?topic", "<" + this.topic.lodID + ">");
+    sparqlSelect1(query, {}, function(result) {
+      var username = result.user.split("/").pop(); // part after last /
+      if (gScope.user && // in case it changed mid-air
+          gScope.user.username == username) {
+        self.topic.curator = gScope.user;
+        self.setIsCurator(true);
+      } else {
+        self.topic.curator = { username : username };
+        self.setIsCurator(false);
+      }
+      gScope.$apply();
+      resultCallback(self.enabled);
+    }, errorCallback);
+  },
+  setIsCurator : function(isCuratorHere) {
+    this.isCuratorHere = isCuratorHere;
+    this.enabled = isCuratorHere;
+    this.collapsed = !isCuratorHere;
   },
   startMain : function() {
     //loadContentPage(url, "Create the " + this.topic.title + " portal");
