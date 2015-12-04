@@ -240,6 +240,8 @@ extend(AllActivity, Activity);
 
 function DisabledActivity() {
   Activity.call(this);
+
+  this.collapsed = true; // HACK Make class for credits
 }
 DisabledActivity.prototype = {
   enabled : false,
@@ -426,10 +428,16 @@ function CreateActivity() {
   Activity.call(this);
 }
 CreateActivity.prototype = {
+  isCuratorHere : false,
+
+  getEnabled : function(resultCallback, errorCallback) {
+    this.isCuratorHere = true; // TODO implement
+    this.enabled = this.isCuratorHere;
+    this.collapsed = !this.enabled;
+    resultCallback(this.enabled);
+  },
   startMain : function() {
-    var domain = this.topic.title.replace(/[ \&\,]*/g, "").toLowerCase() + "expert.org";
-    var url = "http://www.securepaynet.net/domains/search.aspx?prog_id=473220&domainToCheck=" + domain + "&tld=.org&checkAvail=1";
-    loadContentPage(url, "Create the " + this.topic.title + " portal");
+    //loadContentPage(url, "Create the " + this.topic.title + " portal");
   },
 }
 extend(CreateActivity, Activity);

@@ -80,19 +80,19 @@
   a {
     text-decoration: none;
   }
-  #activity-understand .webpages {
+  aside .list {
     margin-left: 5px;
     margin-top: 5px;
     overflow-x: hidden;
     overflow-y: auto;
     max-height: 200pt;
   }
-  #activity-understand .webpages > h3 {
+  aside .list > h3 {
     margin-bottom: 5px;
     padding: 0 2px;
     font-size: inherit;
   }
-  #activity-understand .webpage {
+  aside .list > .listitem {
     padding-top: 0;
     padding-bottom: 0;
     border-bottom: 1px dotted lightgrey;
@@ -170,9 +170,10 @@
         <div ng-show="topic.understand.abstract">{{ topic.understand.abstract | shortenText:200 }}</div>
         <div ng-show="topic.understand.descriptionURL"><a href="{{ topic.understand.descriptionURL }}" target="content">Description</a></div>
         <div ng-show="topic.understand.wikipediaURL"><a href="{{ topic.understand.wikipediaURL }}" target="content">Wikipedia</a></div>
-        <div class="webpages" ng-show="topic.understand.webpages &amp;&amp; topic.understand.webpages.length &gt; 0">
+        <div class="webpages list" ng-show="topic.understand.webpages &amp;&amp; topic.understand.webpages.length">
           <h3>Websites</h2>
-          <div ng-repeat="webpage in topic.understand.webpages" class="webpage"><a href="{{ webpage.url }}" target="content" title="{{ webpage.description }}">{{ webpage.title | shortenText:50 }}</a></div>
+          <div class="edit-links" ng-show="activities.create.isCuratorHere"><a href="links-edit.html" target="content">Edit links</a></div>
+          <div ng-repeat="webpage in topic.understand.webpages" class="webpage listitem"><a href="{{ webpage.url }}" target="content" title="{{ webpage.description }}">{{ webpage.title | shortenText:50 }}</a></div>
         </div>
       </aside>
     </div>
@@ -217,16 +218,22 @@
       <h2>Play</h2>
       <aside></aside>
     </div>
-    <div id="activity-create"
-      ng-click="activities.create.startMain();"
-      ng-show="activities.create.enabled"
-      />
-      <h2>Create</h2>
-      <aside></aside>
+    <div id="activity-create">
+      <h2 ng-click="activities.create.collapsed = !activities.create.collapsed">Create</h2>
+      <aside ng-hide="activities.create.collapsed">
+        <div class="youarecurator" ng-show="activities.create.isCuratorHere">You are Curator for this topic. Please edit all aspects to your heart's content. Be competent, fair and brave.</div>
+        <div class="edit-topic"><a href="topic-edit.html?mode=edit-current" target="content">Edit primary data of this topic</a></div>
+        <div class="edit-links" ng-show="activities.create.isCuratorHere"><a href="links-edit.html" target="content">Edit links in Understand</a></div>
+        <div class="subtopics list" ng-show="topic.children.length">
+          <h3>Sub-Topics</h2>
+          <div ng-repeat="subtopic in topic.children" class="topic listitem"><a href="" ng-click="openTopic(subtopic, 1)">{{ subtopic.title | shortenText:20 }}</a></div>
+          <div class="create-subtopic"><a href="topic-edit.html?mode=new" target="content">Create a new sub-topic</a></div>
+        </div>
+      </aside>
     </div>
     <div id="activity-credits" />
       <h2 ng-click="activities.credits.collapsed = !activities.credits.collapsed">Credits</h2>
-      <aside ng-show="activities.credits.collapsed">
+      <aside ng-hide="activities.credits.collapsed">
         <div class="intro">
           Created with information from
         </div>
