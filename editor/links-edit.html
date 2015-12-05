@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!doctype html>
+<html xmlns="http://www.w3.org/1999/xhtml" ng-app="duTopicEditor">
+<head>
+<title>Labrasol</title>
+<meta charset="utf-8"></meta>
+<style>
+  /**
+  * (c) 2015 Ben Bucksch
+  * License: GPL3, see LICENSE
+  */
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    padding: 0 0 0 0;
+    margin: 0 0 0 0;
+    font-family: Helvetica, Arial, sans-serif;
+  }
+
+  header {
+    height: 8em;
+    padding: 10px 30px;
+  }
+  #tree {
+    position: fixed;
+    top: 8em;
+    left: 0;
+    width: 30%;
+  }
+  #topic {
+    position: fixed;
+    top: 8em;
+    right: 0;
+    width: 65%;
+  }
+
+  .grid {
+    display: table;
+    padding: 0px;
+  }
+  .grid > li {
+    display: table-row;
+    border: inset 1px WindowFrame;
+    border-top: 10px;
+  }
+  .grid > li > * {
+    display: table-cell;
+    margin-bottom: 5px;
+    padding: 0px;
+  }
+  .grid > li > label {
+    padding-right: 15px;
+  }
+
+  #properties label {
+    vertical-align: top;
+  }
+  #properties img {
+    margin-bottom: 15px;
+  }
+  #properties textarea {
+    width: 40em;
+    height: 10em;
+    margin-bottom: 5px;
+  }
+
+</style>
+
+<script type="text/javascript" src="../lib/angular.js"></script>
+
+<script type="text/javascript" src="../util.js"></script>
+<script type="text/javascript" src="../uiutil.js"></script>
+<script type="text/javascript" src="../stringbundle.js"></script>
+
+<script type="text/javascript" src="links-edit.js"></script>
+</head>
+<body id="topic" ng-controller="Topic" ng-show="topic">
+
+<header>
+  <button ng-show="isDirty" ng-click="save()">Save</button>
+</header>
+
+<section>
+  <h1>Understand {{ topic.title }} - Links to important webpages</h1>
+  <div class="link" ng-repeat="page in topic.understand.webpages" >
+    <a class="display" href="{{ page.url }}" target="new">{{ page.title }}</a>
+    <span id="openclose" ng-click="page.collapsed = !page.collapsed">Edit</span>
+    <div class="properties grid" ng-hide="page.collapsed">
+      <li>
+        <label>URL</label>
+        <input type="url" ng-model="page.url" size="60" />
+      </li>
+      <li>
+        <label>Title</label>
+        <input type="text" size="40" ng-model="page.title" />
+      </li>
+      <li>
+        <label>Short description</label>
+        <div>
+          <textarea ng-model="page.description"></textarea>
+        </div>
+      </li>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

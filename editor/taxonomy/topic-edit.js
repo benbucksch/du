@@ -29,7 +29,7 @@ function topicScope() {
 function loadFromFrame() {
   var $scope = topicScope();
   $scope.topic = getCurrentTopicFromFrame();
-  $scope.originalTopic = topic;
+  $scope.originalTopic = topic; // TODO copy
   $scope.isDirty = true;
 }
 

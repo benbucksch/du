@@ -172,7 +172,7 @@
         <div ng-show="topic.understand.wikipediaURL"><a href="{{ topic.understand.wikipediaURL }}" target="content">Wikipedia</a></div>
         <div class="webpages list" ng-show="topic.understand.webpages &amp;&amp; topic.understand.webpages.length">
           <h3>Websites</h2>
-          <div class="edit-links" ng-show="activities.create.isCuratorHere"><a href="links-edit.html" target="content">Edit links</a></div>
+          <div class="edit-links" ng-show="activities.create.isCuratorHere"><a href="editor/links-edit.html" target="content">Edit links</a></div>
           <div ng-repeat="webpage in topic.understand.webpages" class="webpage listitem"><a href="{{ webpage.url }}" target="content" title="{{ webpage.description }}">{{ webpage.title | shortenText:50 }}</a></div>
         </div>
       </aside>
@@ -224,7 +224,7 @@
         <div class="youarecurator" ng-show="activities.create.isCuratorHere">You are Curator for this topic. Please edit all aspects to your heart's content. Be competent, fair and brave.</div>
         <div class="curatoris" ng-show="topic.curator &amp;&amp; !activities.create.isCuratorHere">This topic is curated by {{ username }}</div>
         <div class="edit-topic" ng-show="activities.create.isCuratorHere"><a href="editor/taxonomy/topic-edit.html?mode=edit" target="content">Edit primary data of this topic</a></div>
-        <div class="edit-links" ng-show="activities.create.isCuratorHere"><a href="links-edit.html" target="content">Edit links in Understand</a></div>
+        <div class="edit-links" ng-show="activities.create.isCuratorHere"><a href="editor/links-edit.html" target="content">Edit links in Understand</a></div>
         <div class="subtopics list" ng-show="topic.children.length">
           <h3>Sub-Topics</h2>
           <div ng-repeat="subtopic in topic.children" class="topic listitem"><a href="" ng-click="openTopic(subtopic, 1)">{{ subtopic.title | shortenText:20 }}</a></div>
