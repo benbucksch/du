@@ -493,6 +493,9 @@ NewsActivity.prototype = {
 extend(NewsActivity, Activity);
 
 
+/**
+ * Called from DU activities to load something into the browser
+ */
 function loadContentPage(url, title, keepFrame) {
   ddebug("open URL " + url);
   E("title").textContent = title;
@@ -503,6 +506,39 @@ function loadContentPage(url, title, keepFrame) {
 function clearContentPage() {
   E("title").textContent = "Loading...";
   E("content").src = "";
+}
+
+
+/**
+ * Called from browser
+ */
+function onLoadContentPage(url, hostname) {
+  findTopicForPage(url, hostname, function(topic) {
+    alert("found topic " + topic.id);
+    openTopic(topic, 2);
+  }, errorCritical);
+}
+
+/**
+ * Given a webpage URL, find a topic that lists this webpage.
+ *
+ * @param url {String}  URL of the page, without port or protocol
+ * @param hostname {String}  hostname of the page, without port or protocol
+ * @returns {Topic}
+ */
+function findTopicForPage(url, hostname, resultCallback, errorCallback) {
+  hostname = hostname.replace("www.", "");
+  var query = "SELECT * FROM <http://dmoz.org> WHERE { " +
+    "?topic dmoz:link ?link . " +
+    "?link dmoz:domain ?domain . " +
+    "OPTIONAL { ?link dc:title ?title } " +
+    "OPTIONAL { ?link dc:description ?description } " +
+  "}";
+  query = query.replaceAll("?domain", '"' + hostname + '"');
+  sparqlSelect1(query, {}, function(result) {
+     // TODO take 30 results and find the best URL match
+    uninav.loadTopicByID(result.topic, resultCallback, errorCallback);
+  }, errorCallback);
 }
 
 
